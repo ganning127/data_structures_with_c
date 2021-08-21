@@ -3,7 +3,7 @@
 
 void insertion_sort(int arr[], int n);
 void selection_sort(int arr[], int n);
-
+void show(int arr[], int n);
 int main(void)
 {
     int nums;
@@ -32,32 +32,27 @@ int main(void)
         arr[i] = min + rand() % (max + 1 - min); // random number between [min, max]
     }
 
-    printf("The array before insertion sort in ascending order: ");
-    for (int i = 0; i < nums; ++i)
-    {
-        printf("%d ", arr[i]);
-    }
-    printf("\n");
+    printf("The array before any sorting: ");
+    show(arr, nums);
 
     insertion_sort(arr, nums);
-
     printf("The array after insertion sort in ascending order: ");
-    for (int i = 0; i < nums; ++i)
-    {
-        printf("%d ", arr[i]);
-    }
+    show(arr, nums);
 
     printf("\n");
 
     selection_sort(arr, nums);
-    printf("\n");
-
     printf("The array after selection sort in descending order: ");
-    selection_sort(arr, nums);
-    for (int i = 0; i < nums; ++i)
+    show(arr, nums);
+    return 0;
+}
+
+void show(int arr[], int n)
+{
+    for (int i = 0; i < n; ++i)
     {
         printf("%d ", arr[i]);
     }
+
     printf("\n");
-    return 0;
 }

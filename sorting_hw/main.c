@@ -4,6 +4,7 @@
 void insertion_sort(int arr[], int n);
 void selection_sort(int arr[], int n);
 void show(int arr[], int n);
+
 int main(void)
 {
     int nums;
@@ -49,6 +50,7 @@ int main(void)
 
 void show(int arr[], int n)
 {
+    // function prints arrays out on single line
     for (int i = 0; i < n; ++i)
     {
         printf("%d ", arr[i]);

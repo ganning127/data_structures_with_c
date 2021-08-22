@@ -33,8 +33,12 @@ int main(void)
         arr[i] = min + rand() % (max + 1 - min); // random number between [min, max]
     }
 
+    printf("\n");
+
     printf("The array before any sorting: ");
     show(arr, nums);
+
+    printf("\n");
 
     insertion_sort(arr, nums);
     printf("The array after insertion sort in ascending order: ");

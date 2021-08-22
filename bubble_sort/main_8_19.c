@@ -18,7 +18,7 @@ int main_8_19(void)
     // puts("Enter a character");
     // scanf("%c", &c);
 
-    printf("you entered char: %c\n", c);
+    printf("you entered char: %c\n", c); // char = small int
 
     return 0;
 }

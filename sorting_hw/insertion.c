@@ -9,8 +9,8 @@ void insertion_sort(int arr[], int n)
 
     for (int i = 1; i < n; ++i)
     {
-        curr = arr[i];      // current element
-        less_index = i - 1; // previous element
+        curr = arr[i];      // current element index
+        less_index = i - 1; // previous element index
 
         while (curr < arr[less_index] && less_index >= 0)
         {

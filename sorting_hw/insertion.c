@@ -3,13 +3,13 @@
 
 void insertion_sort(int arr[], size_t n)
 {
-
-    int curr;          // `curr` stores the current element in the array
+    // function uses insertion sort to sort elements in array `arr` in ascending order
+    int curr;          // `curr` stores the value of the current element in the array
     size_t less_index; // `less_index` stores indexes less than the current one
 
     for (size_t i = 1; i < n; ++i)
     {
-        curr = arr[i];      // current element index
+        curr = arr[i];      // current element value
         less_index = i - 1; // previous element index
 
         while (curr < arr[less_index] && less_index >= 0)

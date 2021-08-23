@@ -23,7 +23,7 @@ int main(void)
     printf("Max value: "); // max value that random can generate
     scanf("%d", &max);
 
-    int arr[nums]; // create array with enough memory for `nums` elements (user specified)
+    int arr[nums]; // create array with elements of integer type and with enough memory for `nums` elements (user specified)
 
     srand(seed); // seed random
 

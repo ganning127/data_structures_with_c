@@ -2,9 +2,9 @@
 
 void selection_sort(int arr[], size_t n)
 {
-    // this function, `selection_sort()`, sorts an array in descending order
+    // this function, `selection_sort()`, sorts an array in descending order using selection sort
     size_t max_index; // `max_index` - holds the index of the maximum element in the array
-    int temp;         // `temp` is used for swapping
+    int temp;         // `temp` holds a value in the array and is used for swapping
 
     for (size_t i = 0; i < n; ++i)
     {

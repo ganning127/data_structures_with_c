@@ -8,7 +8,7 @@ void show(int arr[], size_t n);
 int main(void)
 {
     size_t nums;
-    printf("How many numbers do you want? "); // number of elements in array
+    printf("How many numbers do you want? "); // number of elements in array (used to create indexes, so using size_t)
     scanf("%zu", &nums);
 
     int seed;

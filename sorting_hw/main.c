@@ -1,15 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void insertion_sort(int arr[], int n);
-void selection_sort(int arr[], int n);
-void show(int arr[], int n);
+void insertion_sort(int arr[], size_t n); // change int n to size n
+void selection_sort(int arr[], size_t n);
+void show(int arr[], size_t n);
 
 int main(void)
 {
-    int nums;
+    size_t nums;
     printf("How many numbers do you want? "); // number of elements in array
-    scanf("%d", &nums);
+    scanf("%zu", &nums);
 
     int seed;
     printf("What do you want to seed random as? "); // seed for random to use
@@ -27,7 +27,7 @@ int main(void)
 
     srand(seed); // seed random
 
-    for (int i = 0; i < nums; ++i)
+    for (size_t i = 0; i < nums; ++i)
     {
         // populate array with random numbers
         arr[i] = min + rand() % (max + 1 - min); // random number between [min, max]
@@ -52,10 +52,10 @@ int main(void)
     return 0;
 }
 
-void show(int arr[], int n)
+void show(int arr[], size_t n)
 {
     // function prints arrays out on single line
-    for (int i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
         printf("%d ", arr[i]);
     }

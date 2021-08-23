@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void insertion_sort(int arr[], int n)
+void insertion_sort(int arr[], size_t n)
 {
 
-    int curr, less_index; // `curr` stores the current element in the array
-                          // `less_index` stores indexes less than the current one
+    int curr;          // `curr` stores the current element in the array
+    size_t less_index; // `less_index` stores indexes less than the current one
 
     for (int i = 1; i < n; ++i)
     {

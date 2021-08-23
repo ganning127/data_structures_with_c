@@ -1,14 +1,15 @@
-void selection_sort(int arr[], int n)
+#include <stdlib.h>
+
+void selection_sort(int arr[], size_t n)
 {
     // this function, `selection_sort()`, sorts an array in descending order
+    size_t max_index; // `max_index` - holds the index of the maximum element in the array
+    int temp;         // `temp` is used for swapping
 
-    int max_index, temp; // `max_index` - holds the index of the maximum element in the array
-                         // `temp` is used for swapping
-
-    for (int i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
         max_index = i; // set max_index equal to first 'unsorted' element in array
-        for (int j = i + 1; j < n; j++)
+        for (size_t j = i + 1; j < n; j++)
         {
             if (arr[j] > arr[max_index])
             {

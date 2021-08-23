@@ -7,7 +7,7 @@ void insertion_sort(int arr[], size_t n)
     int curr;          // `curr` stores the current element in the array
     size_t less_index; // `less_index` stores indexes less than the current one
 
-    for (int i = 1; i < n; ++i)
+    for (size_t i = 1; i < n; ++i)
     {
         curr = arr[i];      // current element index
         less_index = i - 1; // previous element index

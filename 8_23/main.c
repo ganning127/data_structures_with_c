@@ -16,6 +16,7 @@ int main(void)
     //     printf("%d\n", x);
     // } while (++x < 10);
 
+    printf("%d\n", EOF);
     char grade;
     unsigned int grades[5] = {0};
 

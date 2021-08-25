@@ -2,7 +2,7 @@
 #include <time.h>
 #include <stdlib.h>
 #define example 42 // not an variable/integer, but is a piece of text. everywhere that has "example" in the code gets replaced with 42
-
+int x = 3;         // global var
 enum Status
 {
     CONTINUE,

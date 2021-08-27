@@ -1,42 +1,43 @@
 #include <stdio.h>
 #include <stdlib.h>
-void functionPrintArrayInfo(int *arr, size_t size);
+void functionPrintArrayInfo(int arr[], size_t size);
 
 /*
 
 Output:
-array: 8 10 4 9 1 3 5 9 4 10 
+array: 5 4 10 4 7 2 2 1 1 6 
 
 Printing elements within `main()`
 size of array: 10
-address of size of array: 0x7ffee2158824
-address of the array: 0x7ffee21587c0
-address of first element in the array: 0x7ffee21587c0
-value of the array: 8
+address of size of array: 0x7ffee947f824
+address of the array: 0x7ffee947f7c0
+address of first element in the array: 0x7ffee947f7c0
+value of the array: 5
 
 
 Printing elements within `functionPrintArrayInfo()`
 size of array: 10
-address of size of array: 0x7ffee21587a0
-address of the array: 0x7ffee21587c0
-address of first element in the array: 0x7ffee21587c0
-value of the array: 8
+address of size of array: 0x7ffee947f7a0
+address of the array: 0x7ffee947f7c0
+address of first element in the array: 0x7ffee947f7c0
+value of the array: 5
 
 Things I learned
-- The entire array's memory address is the same as the first element in the array's address
+- The array's memory address is the same as the first element in the array's address
+- In the `functionPrintArrayInfo()` function, when we print the value of the array by using `*arr`, we get the value of the first element in the array because the memory address of the array is the same as the memory address of the first element's address 
 - Array elements are stored in consecutive memory locations 
 - When you pass an array to another function as an argument, the array actually gets passed as a memory address, not the "entire" array value 
 - The address that is passed as an argument is the address of the first element in the array
 - Printing the value of the array just prints the first element in the array
 - The memory address of the array passed from the `main()` function to the `functionPrintArrayInfo()` is the same in both 
 - The memory address of the size of the array is different because passing the size paramter is pass by value, so a copy is made and sent to the `functionPrintArrayInfo()` function
-- Since the `arr` paramter is the memory address of the array, the 
+- The value of the `size` paramter is the same as in the `main()` function
 
 */
 
 int main(void)
 {
-
+    srand(42);
     size_t size = 10; // 10 elements in array
 
     int arr[size]; // initialize array

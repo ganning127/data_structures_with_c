@@ -5,7 +5,8 @@ void functionPrintArrayInfo(int arr[], int size);
 /*
 
 Printing the array in the main() function:
-- The array's address is the same as the first element in the array's address
+- The entire array's address is the same as the first element in the array's address
+- I learned that when you pass an array to another function as an argument, the array actually gets passed as a memory address, not the "entire" array. 
 - 
 
 */

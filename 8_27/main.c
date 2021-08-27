@@ -9,33 +9,28 @@ array: 8 10 4 9 1 3 5 9 4 10
 
 Printing elements within `main()`
 size of array: 10
-address of size of array: 0x7ffee66f7824
-address of the array: 0x7ffee66f77c0
-address of first element in the array: 0x7ffee66f77c0
+address of size of array: 0x7ffee2158824
+address of the array: 0x7ffee21587c0
+address of first element in the array: 0x7ffee21587c0
 value of the array: 8
 
 
 Printing elements within `functionPrintArrayInfo()`
-size of array: 1
-address of size of array: 0x7ffee66f779c
-address of the array: 0x7ffee66f77c0
-address of first element in the array: 0x7ffee66f77c0
+size of array: 10
+address of size of array: 0x7ffee21587a0
+address of the array: 0x7ffee21587c0
+address of first element in the array: 0x7ffee21587c0
 value of the array: 8
-
-- The size of the array in `main()` is accurate, which is 10, but the size of the array when printed in `functionPrintArrayInfo()` gives a value of 1. This is because the memory address of the first element in the array is passed to the function, not the “entire” array itself
-- The memory addresses of the arrays when printed in the two functions are the same, so arrays are passed by memory addresses
 
 Things I learned
 - The entire array's memory address is the same as the first element in the array's address
 - Array elements are stored in consecutive memory locations 
 - When you pass an array to another function as an argument, the array actually gets passed as a memory address, not the "entire" array value 
-- That's why when getting the array size by using *arr in the `functionPrintArrayInfo()` function, the size is 1 because the address is the first element in the array
 - The address that is passed as an argument is the address of the first element in the array
 - Printing the value of the array just prints the first element in the array
-- To print multiple elements in the array from the function, we need to increment the pointer to the array by using ++arr
 - The memory address of the array passed from the `main()` function to the `functionPrintArrayInfo()` is the same in both 
-- To achieve the same output in the `functionPrintArrayInfo()` function as in `main()`, I needed to set the `arr` argument as a pointer type
-
+- The memory address of the size of the array is different because passing the size paramter is pass by value, so a copy is made and sent to the `functionPrintArrayInfo()` function
+- Since the `arr` paramter is the memory address of the array, the 
 
 */
 
@@ -80,15 +75,14 @@ int main(void)
     return 0;
 }
 
-void functionPrintArrayInfo(int *arr, size_t size)
+void functionPrintArrayInfo(int arr[], size_t size)
 {
     printf("\n\nPrinting elements within `functionPrintArrayInfo()`\n");
 
-    int array_size = sizeof(*arr) / sizeof(arr[0]);
-    printf("size of array: %d\n", array_size);
+    printf("size of array: %zu\n", size);
 
     // memory of size address
-    printf("address of size of array: %p\n", &array_size);
+    printf("address of size of array: %p\n", &size);
 
     // adderss of the array itself
     printf("address of the array: %p\n", arr);

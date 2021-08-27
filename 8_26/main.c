@@ -34,9 +34,9 @@ unsigned int it_fib(int num)
 
 unsigned int fib(int num)
 {
-    static unsigned int count;
-    ++count;
-    printf("count: %d\n", count);
+    // static unsigned int count;
+    // ++count;
+    // printf("count: %d\n", count);
     if (num < 2)
         return num;
     return fib(num - 1) + fib(num - 2);

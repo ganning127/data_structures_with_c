@@ -4,15 +4,14 @@
 
 enum Status
 {
-    CONTINUE,
+    LOST,
     WON,
-    LOST
+    CONTINUE
 } game_state;
 int rolls;
 
 unsigned int roll_die(unsigned int s);
 enum Status check_first_roll(unsigned int point);
-int check_game_state(enum Status game_state, unsigned int point);
 enum Status check_roll(unsigned int point, unsigned int rolled_point);
 int play_game(void);
 
@@ -41,8 +40,8 @@ int main(void)
         result = play_game();
         total_rolls += rolls;
         ++records[result];
-        printf("result: %d\n", result);
-        printf("\n");
+        // printf("result: %d\n", result);
+        // printf("\n");
     }
 
     double chance_of_winning;
@@ -57,39 +56,34 @@ int main(void)
 
 int play_game(void)
 {
-
-    int result;
+    // function runs the craps game
 
     game_state = CONTINUE;
 
     unsigned int point = roll_die(6) + roll_die(6);
     rolls = 1;
     game_state = check_first_roll(point);
-    result = check_game_state(game_state, point);
-
-    // printf("Point: %d\n", point);
 
     while (game_state == CONTINUE)
     {
         ++rolls;
         unsigned int rolled_point = roll_die(6) + roll_die(6);
-        // printf("rolled_score: %d\n", rolled_point);
         game_state = check_roll(point, rolled_point);
-        result = check_game_state(game_state, rolled_point);
     }
 
-    return result;
+    return (int)game_state;
 }
 
 enum Status check_roll(unsigned int point, unsigned int rolled_point)
 {
+    // checks whether or not the user wins or not on every roll execpt for the first one
     enum Status game_state;
 
     if (rolled_point == 7)
     {
         game_state = LOST;
     }
-    else if (rolled_point == point)
+    else if (rolled_point == point) // switch can't be used to test against a variable
     {
         game_state = WON;
     }
@@ -103,6 +97,7 @@ enum Status check_roll(unsigned int point, unsigned int rolled_point)
 
 enum Status check_first_roll(unsigned int point)
 {
+    // checks whether or not the user won on the first roll
     enum Status game_state;
 
     switch (point)
@@ -123,23 +118,9 @@ enum Status check_first_roll(unsigned int point)
     return game_state;
 }
 
-int check_game_state(enum Status game_state, unsigned int point)
-{
-    if (game_state == WON)
-    {
-        // printf("You have rolled a %d, and won!\n", point);
-        return 1;
-    }
-    else if (game_state == LOST)
-    {
-        // printf("You have rolled a %d, and lost :(\n", point);
-        return 0;
-    }
-    return -1; // represents `CONTINUE`
-}
-
 unsigned int roll_die(unsigned int s)
 {
+    // generates a random number between [0, s]
     unsigned int remainder = RAND_MAX % s;
     unsigned int roll;
 

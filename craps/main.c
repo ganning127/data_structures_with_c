@@ -15,6 +15,7 @@ enum Status check_first_roll(unsigned int point);
 enum Status check_roll(unsigned int point, unsigned int rolled_point);
 int play_game(void);
 
+// add the number of rolls all together and divide by 1000
 int main(void)
 {
     // populate array with zeros

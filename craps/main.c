@@ -23,100 +23,85 @@ int main(void)
     int total_rolls = 0;
     for (size_t i = 0; i < 2; ++i)
     {
-        records[i] = 0;
+        records[i] = 0; // records holds the number of wins (index 1), and number of losses (index 0)
     }
 
     // seed random
     srand(42);
 
-    /*
-        LOSS = 0
-        WIN = 1
-    */
-    int result;
+    int result; // win = 1, loss = 0
 
     // play the game 1000 times
     for (size_t j = 0; j < 1000; ++j)
     {
+        // play the game 1000 times
         result = play_game();
         total_rolls += rolls;
         ++records[result];
-        // printf("result: %d\n", result);
-        // printf("\n");
     }
 
     double chance_of_winning;
-    chance_of_winning = (double)records[1] / (records[0] + records[1]);
+    chance_of_winning = (double)records[1] / (records[0] + records[1]); // number of wins divided by total
 
+    // chances of winning to 2 decimal places, length of game to 2 decimal places
     printf("final results\n------------\n");
     printf("losses: %d\n", records[0]);
     printf("wins: %d\n", records[1]);
-    printf("chance of winning: %.2f%%\n", chance_of_winning);
-    printf("average rolls before game end: %.2f\n", (double)total_rolls / 1000);
+    printf("chance of winning: %.2lf%%\n", chance_of_winning);
+    printf("average rolls before game end: %.2lf\n", (double)total_rolls / 1000);
 }
 
 int play_game(void)
 {
     // function runs the craps game
-
     game_state = CONTINUE;
 
-    unsigned int point = roll_die(6) + roll_die(6);
-    rolls = 1;
-    game_state = check_first_roll(point);
+    unsigned int point = roll_die(6) + roll_die(6); // initial point
+    game_state = check_first_roll(point);           // either: CONTINUE, LOST, WON
 
-    while (game_state == CONTINUE)
+    for (rolls = 1; game_state == CONTINUE; ++rolls)
     {
-        ++rolls;
+        // game loops until the user WON / LOSt
         unsigned int rolled_point = roll_die(6) + roll_die(6);
         game_state = check_roll(point, rolled_point);
     }
 
-    return (int)game_state;
+    return (int)game_state; // won = 1, loss = 0
 }
 
 enum Status check_roll(unsigned int point, unsigned int rolled_point)
 {
     // checks whether or not the user wins or not on every roll execpt for the first one
-    enum Status game_state;
-
     if (rolled_point == 7)
     {
-        game_state = LOST;
+        return LOST;
     }
     else if (rolled_point == point) // switch can't be used to test against a variable
     {
-        game_state = WON;
+        return WON;
     }
     else
     {
-        game_state = CONTINUE;
+        return CONTINUE;
     }
-
-    return game_state;
 }
 
 enum Status check_first_roll(unsigned int point)
 {
     // checks whether or not the user won on the first roll
-    enum Status game_state;
 
     switch (point)
     {
     case 7:
     case 11:
-        game_state = WON;
-        break;
+        return WON;
     case 2:
     case 3:
     case 12:
-        game_state = LOST;
-        break;
+        return LOST;
     default:
-        game_state = CONTINUE;
+        return CONTINUE;
     }
-
-    return game_state;
 }
 
 unsigned int roll_die(unsigned int s)

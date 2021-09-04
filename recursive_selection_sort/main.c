@@ -26,7 +26,7 @@ SELECTION SORT:
             swap currrent index with max_index.
             sort rest of array.
 */
-// get max index of the elements in subarray arr[0..i), i.e., from arr[0] to arr[i - 1]
+// get max index of the elements in subarray arr[0..i]
 size_t max_index(int *arr, size_t i)
 {
     if (i == 0)

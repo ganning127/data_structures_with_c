@@ -2,11 +2,8 @@
 #include <stdlib.h>
 
 void selection_sort(int arr[], int n, size_t i);
-
-int random_int(int min, int max)
-{
-    return min + rand() % (max + 1 - min);
-}
+size_t max_index(int *arr, size_t i);
+int random_int(int min, int max);
 
 /*
 SELECTION SORT:
@@ -26,9 +23,36 @@ SELECTION SORT:
             swap currrent index with max_index.
             sort rest of array.
 */
-// get max index of the elements in subarray arr[0..i]
+
+int main()
+{
+    size_t length = 10; // length of the array
+    int arr[length];
+
+    for (size_t i = 0; i < length; ++i)
+    {
+        arr[i] = random_int(1, 10); // populate array with elements from 1-10
+    }
+
+    selection_sort(arr, length, length - 1); // recursive selection sort
+
+    for (size_t i = 0; i < length; ++i)
+    {
+        printf("%d ", arr[i]); // print the array out
+    }
+    printf("\n");
+
+    return 0;
+}
+
+int random_int(int min, int max)
+{
+    return min + rand() % (max + 1 - min);
+}
+
 size_t max_index(int *arr, size_t i)
 {
+    // get max index of the elements in subarray arr[0..i]
     if (i == 0)
         return 0;
     size_t max_i = max_index(arr, i - 1);
@@ -42,38 +66,16 @@ size_t max_index(int *arr, size_t i)
     }
 }
 
-int main()
+void selection_sort(int arr[], int n, size_t i)
 {
-    size_t length = 10;
-    int arr[4] = {1, 9, 96, 4};
-    size_t arr_len = sizeof(arr) / sizeof(arr[0]);
+    if (i == 0) // base case
+        return;
 
-    size_t max_i = max_index(arr, arr_len - 1);
-    printf("max index; %zu\n", max_i);
-    // for (size_t j = 0; j < length; ++j)
-    // {
-    //     arr[j] = random_int(1, 10); // populate array
-    // }
+    size_t max_i = max_index(arr, i);
 
-    // selection_sort(arr, 4, 0);
-
-    // for (size_t i = 0; i < 4; ++i)
-    // {
-    //     printf("%d ", arr[i]);
-    // }
-
-    printf("\n");
-
-    return 0;
+    // swap current element and element at max index
+    int temp = arr[i];
+    arr[i] = arr[max_i];
+    arr[max_i] = temp;
+    selection_sort(arr, n, i - 1);
 }
-
-// void selection_sort(int arr[], int n, size_t i)
-// {
-//     if (i == 0)
-//     {
-//         return;
-//     }
-
-//     size_t max_i = max_index(arr, n, 0);
-//     printf("max index; %zu\n", max_i);
-// }

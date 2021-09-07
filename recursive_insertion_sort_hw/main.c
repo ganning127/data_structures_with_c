@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void insertion_sort(int arr[], size_t n, size_t i);
+void insertion_sort(int arr[], size_t i);
 int random_int(int min, int max);
+void insert(int arr[], size_t i);
 
 int main(void)
 {
@@ -13,9 +14,12 @@ int main(void)
     for (size_t j = 0; j < length; ++j)
     {
         arr[j] = random_int(1, 10); // populate array
+        printf("%d ", arr[j]);
     }
 
-    insertion_sort(arr, 10, 0);
+    printf("\n");
+
+    insertion_sort(arr, length);
 
     for (size_t i = 0; i < 10; ++i)
     {
@@ -32,29 +36,45 @@ int random_int(int min, int max)
     return min + rand() % (max + 1 - min);
 }
 
-void insertion_sort(int arr[], size_t n, size_t i)
+void insert(int arr[], size_t i)
 {
-    int el, j;
-
-    if (i == n - 1)
-    {
+    if (i == 0)
         return;
-    }
-    else
-    {
-        insertion_sort(arr, n, i + 1);
-        el = arr[i];
 
-        // All elements to the right of index i are assumed to be sorted.
-        // Now we just have to figure out where el fits in the sorted array
-        for (j = i + 1; j < n; j++)
-        {
-            if (el > arr[j])
-            {
-                // el is bigger, swap so el moves to the right in the array.
-                arr[j - 1] = arr[j];
-                arr[j] = el;
-            }
-        }
+    if (arr[i] < arr[i - 1])
+    {
+        int temp = arr[i];
+        arr[i] = arr[i - 1];
+        arr[i - 1] = temp;
     }
+
+    insert(arr, i - 1);
 }
+
+void insertion_sort(int arr[], size_t i)
+{
+    if (i == 0)
+        return;
+
+    insertion_sort(arr, i - 1);
+
+    insert(arr, i);
+}
+
+/*
+    function insert()
+        base case: 
+            at index 0, just use return; (no value)
+        otherwise: 
+            compare to prev element, and swap if necessary.
+            recursive function call on array and index-1
+
+    function insertion_sort()
+        **start at end of the array (pass in size)
+        base_case:
+            at the beginning, juse use return; (no value)
+        otherwise:
+            recursive function call on array and index-1
+            insert current index into sorted array using insert().
+            decrement static index
+*/

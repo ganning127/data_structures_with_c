@@ -26,7 +26,7 @@ int main(void)
     printf("value of (a+1): %p\n", a + 1);    // adds 4 b/c int is 4 bytes wide
 
     x = 2 + (2 << 9) + (2 << 17) + (2 >> 25); // 2**9, 2**17, 2*25, +2
-    cptr = (char *)xptr;
+    cptr = (char *)xptr;                      // allows us to read the integer one byte at a time
 
     printf("deref char pointer: %d\n", *(cptr + 2));
 

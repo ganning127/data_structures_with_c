@@ -19,10 +19,11 @@ Const pointer to const var
  - Value of pointer CANNOT be changed
  - Variable value that the pointer is pointing to CANNOT be changed
  - Why? Since the pointer is constant, it cannot point to a differnt variable than from the one which it is declared to point to. Additionally, since the pointer to pointing to a constant variable, the variable's value cannot be modified
-
 */
-
-void change_values(int *pointer_to_int, int const *pointer_to_const_int, const int *const_pointer_to_int, const int *const_pointer_to_const_int);
+void change_pointer_to_int(int *pointer_to_int);
+void change_pointer_to_const_int(int *pointer_to_const_int);
+void change_const_pointer_to_int(int *const const_pointer_to_int);
+void change_const_pointer_to_const_int(int *const const_pointer_to_const_int);
 
 int main(void)
 {
@@ -30,25 +31,40 @@ int main(void)
     int *pointer_to_int = &x;
 
     const int const_x = 1;
-    int const *pointer_to_const_int = &const_x;
-    // int *pointer_to_const_int = &const_x; // gives a warning, saying that qualifiers are discarded because the pointer is not a constant, but the value that the pointer is pointing to IS const
-    const int *const_pointer_to_int = &x;
-    const int *const_pointer_to_const_int = &const_x;
-    change_values(pointer_to_int, pointer_to_const_int, const_pointer_to_int, const_pointer_to_const_int);
+    int *pointer_to_const_int = &const_x; // gives a warning, saying that qualifiers are discarded because the pointer is not a constant, but the value that the pointer is pointing to IS const
+    int *const const_pointer_to_int = &x;
+    int *const const_pointer_to_const_int = &const_x;
+
+    change_pointer_to_int(pointer_to_int);
+    change_pointer_to_const_int(pointer_to_const_int);
+    change_const_pointer_to_int(const_pointer_to_int);
+    change_const_pointer_to_const_int(const_pointer_to_const_int);
+
     return 0;
 }
-
-void change_values(int *pointer_to_int, int const *pointer_to_const_int, const int *const_pointer_to_int, const int *const_pointer_to_const_int)
+void change_pointer_to_int(int *pointer_to_int)
 {
-    // change value of pointer
-    pointer_to_int++;
-    pointer_to_const_int++;
-    const_pointer_to_int++;
-    const_pointer_to_const_int++;
-
-    // change value of int
+    int x = 124;
     (*pointer_to_int)++;
+    pointer_to_int = &x;
+}
+
+void change_pointer_to_const_int(int *pointer_to_const_int)
+{
+    int x = 124;
+    pointer_to_const_int = &x;
     // (*pointer_to_const_int)++; // pointers to const ints cannot be modified
-    // (*const_pointer_to_int)++; // const pointers cannot be modified
-    // (*const_pointer_to_const_int)++; // const pointers cannot be modified
-};
+}
+void change_const_pointer_to_int(int *const const_pointer_to_int)
+{
+    int x = 124;
+    // (*const_pointer_to_int)++; // const pointers values cannot be modified
+    // const_pointer_to_int = &x; //  pointer's pointee variable can't be modified
+}
+
+void change_const_pointer_to_const_int(int *const const_pointer_to_const_int)
+{
+    int x = 124;
+    // (*const_pointer_to_const_int)++; // const pointers values cannot be modified
+    // const_pointer_to_const_int = &x; //  pointer's pointee variable can't be modified
+}

@@ -12,7 +12,6 @@ void fillArray(int arr[], size_t length);
 void showArr(int arr[], size_t length);
 int getMedian(int arr[], size_t length);
 void showMode(int arr[], size_t length);
-
 double getAverage(int arr[], size_t length);
 
 int main()
@@ -202,6 +201,5 @@ void insertion_sort(int arr[], size_t i)
             at the beginning, juse use return; (no value)
         otherwise:
             recursive function call on array and index-1
-            insert current index into sorted array using insert().
-            decrement static index
+            insert current index into sorted array using insert()
 */

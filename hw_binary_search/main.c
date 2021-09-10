@@ -12,9 +12,23 @@ int main(void)
     fillArrayWithEven(arr, length);
     // showArray(arr, length);
 
-    // int index = binarySearch(arr, 0, length - 1, 1);
-    int index = binarySearchRecursive(arr, length, 11);
-    printf("Index: %d\n", index);
+    int test1 = binarySearchRecursive(arr, length, -65);
+    printf("test1 (-65): %d\n", test1); // -1
+
+    int test2 = binarySearchRecursive(arr, length, 11);
+    printf("test2 (11): %d\n", test2); // -1
+
+    int test3 = binarySearchRecursive(arr, length, 2005);
+    printf("test3 (2005): %d\n", test3); // -1
+
+    int test4 = binarySearchRecursive(arr, length, -2);
+    printf("test4 (-2): %d\n", test4); // -1
+
+    int test5 = binarySearchRecursive(arr, length, 100);
+    printf("test5 (100): %d\n", test5); // 49
+
+    int test6 = binarySearchRecursive(arr, length, 2002);
+    printf("test6 (2002): %d\n", test6); // -1
     return 0;
 }
 

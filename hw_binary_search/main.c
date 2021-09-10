@@ -57,28 +57,28 @@ int binarySearchRecursive(int arr[], size_t end, int target)
         return -1;
     }
 
-    int m = end / 2; // middle of search scope
+    int middle = end / 2; // middle of search scope
     int found;
 
-    if (arr[m] == target)
+    if (arr[middle] == target)
     {
-        found = m;
+        found = middle;
     }
-    else if (arr[m] < target)
+    else if (arr[middle] < target)
     {
         // Upper half. We'll search in upper half of the current array with new length of the upper half
-        found = binarySearchRecursive(arr + m + 1, end - m - 1, target);
+        found = binarySearchRecursive(arr + middle + 1, end - middle - 1, target);
         if (found != -1)
         {
             // Need to offset the key
-            found += m + 1;
+            found += middle + 1;
         }
     }
     else
     {
         // Lower half, there is no need to offset the array
         // New array length is equal to the current middle point
-        found = binarySearchRecursive(arr, m, target);
+        found = binarySearchRecursive(arr, middle, target);
     }
 
     return found;

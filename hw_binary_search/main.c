@@ -1,18 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
-int binarySearch(int arr[], size_t end, int target);
+#include <assert.h>
 void fillArrayWithEven(int arr[], size_t size);
 void showArray(int arr[], size_t end);
-
+int binarySearchRecursive(int arr[], size_t end, int target);
 int main(void)
 {
-    size_t length = 10;
+    int length = 1000;
     int arr[length];
 
     fillArrayWithEven(arr, length);
-    showArray(arr, length);
+    // showArray(arr, length);
 
-    int index = binarySearch(arr, length, 6);
+    // int index = binarySearch(arr, 0, length - 1, 1);
+    int index = binarySearchRecursive(arr, length, 11);
     printf("Index: %d\n", index);
     return 0;
 }
@@ -35,32 +36,36 @@ void fillArrayWithEven(int arr[], size_t size)
     }
 }
 
-int binarySearch(int arr[], size_t end, int target)
+int binarySearchRecursive(int arr[], size_t end, int target)
 {
-    size_t middle = end / 2;
-
-    printf("middle: %zu\n", middle);
-    if (arr[middle] == target)
+    if (end == 0)
     {
-        return middle;
+        return -1;
+    }
+
+    int m = end / 2; // middle of search scope
+    int found;
+
+    if (arr[m] == target)
+    {
+        found = m;
+    }
+    else if (arr[m] < target)
+    {
+        // Upper half. We'll search in upper half of the current array with new length of the upper half
+        found = binarySearchRecursive(arr + m + 1, end - m - 1, target);
+        if (found != -1)
+        {
+            // Need to offset the key
+            found += m + 1;
+        }
     }
     else
     {
-        if (target > arr[middle])
-            return binarySearch(arr, arr + end / 2, target);
-
-        else
-            return binarySearch(arr, end / 2, target);
+        // Lower half, there is no need to offset the array
+        // New array length is equal to the current middle point
+        found = binarySearchRecursive(arr, m, target);
     }
-}
 
-/*
-BINARY SEARCH:
-    *don't need min and max index*
-    pass in array, size, target
-    Check middle
-    if not value:
-        call again on either (array and size/2)or (array+size/2 and size/2)
-    else:
-        return index
-*/
+    return found;
+}

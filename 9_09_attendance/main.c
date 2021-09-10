@@ -30,7 +30,7 @@ int main(void)
     int x = 0;
     int *pointer_to_int = &x;
 
-    const int const_x = 1;
+    int const const_x = 1;
     int *pointer_to_const_int = &const_x; // gives a warning, saying that qualifiers are discarded because the pointer is not a constant, but the value that the pointer is pointing to IS const
     int *const const_pointer_to_int = &x;
     int *const const_pointer_to_const_int = &const_x;

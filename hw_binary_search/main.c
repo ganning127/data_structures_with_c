@@ -6,13 +6,14 @@ void showArray(int arr[], size_t end);
 
 int main(void)
 {
-    size_t length = 1000;
+    size_t length = 10;
     int arr[length];
 
     fillArrayWithEven(arr, length);
-    // showArray(arr, length);
+    showArray(arr, length);
 
-    binarySearch(arr, length - 1, 4);
+    int index = binarySearch(arr, length, 6);
+    printf("Index: %d\n", index);
     return 0;
 }
 
@@ -45,14 +46,18 @@ int binarySearch(int arr[], size_t end, int target)
     }
     else
     {
+        if (target > arr[middle])
+            return binarySearch(arr, arr + end / 2, target);
+
+        else
+            return binarySearch(arr, end / 2, target);
     }
-    return 0;
 }
 
 /*
 BINARY SEARCH:
     *don't need min and max index*
-    pass in array, size, ta rget
+    pass in array, size, target
     Check middle
     if not value:
         call again on either (array and size/2)or (array+size/2 and size/2)

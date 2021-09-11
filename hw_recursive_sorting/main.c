@@ -10,19 +10,19 @@ size_t max_index(int *arr, size_t i);
 int random_int(int min, int max);
 void fillArray(int arr[], size_t length);
 void showArr(int arr[], size_t length);
-int getMedian(int arr[], size_t length);
+double getMedian(int arr[], size_t length);
 void showMode(int arr[], size_t length);
 double getAverage(int arr[], size_t length);
 
 int main()
 {
-    int arr[ARR_LENGTH];
-    srand(42);
+    int arr[ARR_LENGTH]; // initialize array with ARR_LENGTH
+    srand(42);           // seed random
 
-    fillArray(arr, ARR_LENGTH);
+    fillArray(arr, ARR_LENGTH); // fills the array
 
     printf("Before any sorting\n");
-    showArr(arr, ARR_LENGTH);
+    showArr(arr, ARR_LENGTH); // prints array on screen
 
     printf("\n");
 
@@ -31,13 +31,13 @@ int main()
     showArr(arr, ARR_LENGTH);
 
     // analysis
-    int median = getMedian(arr, ARR_LENGTH);
-    double avg = getAverage(arr, ARR_LENGTH);
+    double median = getMedian(arr, ARR_LENGTH); // median of array
+    double avg = getAverage(arr, ARR_LENGTH);   // averge of all elements in array
 
     printf("\n");
 
-    insertion_sort(arr, ARR_LENGTH - 1);
-    printf("After selection sort in descending order\n");
+    insertion_sort(arr, ARR_LENGTH - 1); // recursive insertion sort
+    printf("After insertion sort in descending order\n");
     showArr(arr, ARR_LENGTH);
 
     printf("\n");
@@ -49,11 +49,7 @@ int main()
 
 void showMode(int arr[], size_t length)
 {
-    // create array with 100 elements (1-100)
-    // loop through all elements in the array
-    // for each element, add them to its index value
-    // look through array to find the max value
-
+    // prints out the mode of arr[]
     int counts[MAX_NUM + 1];
     // populate array with zeros
     for (size_t j = 0; j < MAX_NUM + 1; ++j)
@@ -86,19 +82,23 @@ void showMode(int arr[], size_t length)
 
 double getAverage(int arr[], size_t length)
 {
+    // returns the average of all elemets in arr[]
     int sum = 0;
 
     for (size_t i = 0; i < length; ++i)
     {
         sum += arr[i];
     }
-    int avg = (double)sum / ARR_LENGTH;
+
+    double avg = (double)sum / ARR_LENGTH;
+
     return avg;
 }
 
-int getMedian(int arr[], size_t length)
+double getMedian(int arr[], size_t length)
 {
-    float median = 0;
+    // returns the median element in arr[]
+    double median = 0;
 
     // if number of elements are even
     if (length % 2 == 0)
@@ -112,6 +112,7 @@ int getMedian(int arr[], size_t length)
 
 void fillArray(int arr[], size_t length)
 {
+    // fills array with random nunbers from [0, MAX_NUM]
     for (size_t i = 0; i < length; ++i)
     {
         arr[i] = random_int(0, MAX_NUM);
@@ -120,6 +121,7 @@ void fillArray(int arr[], size_t length)
 
 void showArr(int arr[], size_t length)
 {
+    // prints out the array with a newline at the end
     for (size_t i = 0; i < length; ++i)
     {
         printf("%d ", arr[i]);
@@ -129,6 +131,7 @@ void showArr(int arr[], size_t length)
 
 int random_int(int min, int max)
 {
+    // returns num from [min, max]
     return min + rand() % (max + 1 - min);
 }
 
@@ -150,6 +153,7 @@ size_t max_index(int *arr, size_t i)
 
 void selection_sort(int arr[], int n, size_t i)
 {
+    // recursively sort arr[] using selection sort
     if (i == 0) // base case
         return;
 
@@ -164,6 +168,7 @@ void selection_sort(int arr[], int n, size_t i)
 
 void insert(int arr[], size_t i)
 {
+    // inserts the maximum element of the unsorted array recursively
     if (i == 0)
         return;
 
@@ -179,6 +184,7 @@ void insert(int arr[], size_t i)
 
 void insertion_sort(int arr[], size_t i)
 {
+    // insertion sort in descending order
     if (i == 0)
         return;
 
@@ -188,6 +194,7 @@ void insertion_sort(int arr[], size_t i)
 }
 
 /*
+pseudocode
     function insert()
         base case: 
             at index 0, just use return; (no value)

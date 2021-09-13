@@ -42,7 +42,7 @@ int main()
 
     printf("\n");
     printf("Mean: %.1lf\n", avg);
-    printf("Median: %.1f\n", (double)median);
+    printf("Median: %.1f\n", median);
     showMode(arr, ARR_LENGTH);
     return 0;
 }

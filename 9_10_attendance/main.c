@@ -5,6 +5,7 @@
 
 int main(int argc, char *argv[])
 {
+    // argv is an array of strings
     int result = atoi(argv[1]); // 0th element is the `./programName`
 
     for (size_t i = 1; i < argc; ++i)

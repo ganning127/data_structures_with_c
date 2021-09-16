@@ -62,21 +62,15 @@ int binarySearch(int arr[], size_t end, int key)
     int found;               // index of the key element
 
     if (arr[middle] == key)
-    {
-        found = middle;
-    }
+        found = middle; // match was found
     else if (arr[middle] < key)
     {
         found = binarySearch(arr + middle + 1, end - middle - 1, key); // search for the "right" half of the array
-        if (found != -1)
-        {
+        if (found != -1)                                               // make sure return is not -1
             found += middle + 1;
-        }
     }
     else
-    {
         found = binarySearch(arr, middle, key); // search the "left" half of the array
-    }
 
     return found; // return index of found element
 }

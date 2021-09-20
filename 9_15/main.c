@@ -104,6 +104,24 @@ int main(void)
     union number *vPtr = &value; // breaks code
     vPtr->x = 42;                // breaks code
     printf("%d, %f\n", value.x, value.y);
+
+    typedef struct student
+    {
+        char *first_name;
+        char last_name[2];
+    } Student;
+
+    Student me = {
+        "Ganning",
+        "Xu"};
+
+    printf("&me: %p\n", &me);
+    printf("&me.first_name: %p\n", &(me.first_name));
+    printf("&me.last_name[0]: %p\n", &(me.last_name[0]));
+    printf("&me.last_name[1]: %p\n", &(me.last_name[1]));
+
+    printf("length: %lu\n", sizeof(me));
+
     return 0;
 }
 

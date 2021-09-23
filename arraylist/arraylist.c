@@ -4,7 +4,7 @@
 
 typedef struct arraylist
 {
-    int *array;
+    int *array;      // declared as pointer so we don't need to specify size
     size_t size;     // how many elements its currently holding
     size_t capacity; // how many elements it can hold
 } ArrayList;
@@ -14,7 +14,7 @@ void al_destroy(ArrayList **listPtr);
 void al_print(ArrayList *list);
 void resize_if_full(ArrayList *list);
 void al_insert(ArrayList *list, int key);
-void al_remove(ArrayList *list, int key);
+void al_delete(ArrayList *list, int key);
 
 int main(void)
 {
@@ -26,7 +26,7 @@ int main(void)
     al_insert(nu, 1);
     al_insert(nu, -35);
 
-    al_remove(nu, 1);
+    al_delete(nu, 1);
 
     for (int i = 0; i < 10; ++i)
         al_insert(nu, i);
@@ -44,20 +44,39 @@ void al_insert(ArrayList *list, int key)
     size_t i;
     for (i = list->size++; i > 0 && list->array[i - 1] > key; --i)
     {
+        // similar to insertion sort
         // list->array[i - 1] > key, then list->array[i - 1] needs to be shifted towards the end by 1
         list->array[i] = list->array[i - 1];
     }
     list->array[i] = key;
 }
 
-void al_remove(ArrayList *list, int key)
+void al_delete(ArrayList *list, int key)
 {
     /*
-        look from the foront
-        once we find it, start shifting things
+        look from the front     
+        once we find it, start shifting things behind the item found
 
-        remove will make one full pass of the array
+        starting from front will make one full pass of the array
     */
+    size_t i = 0;
+    for (; i < list->size && key != list->array[i]; ++i)
+    {
+    } // for loop does seraching for us, we don't need a body
+    // at this point, i is at the size or at the first instance of the key
+
+    for (; i < list->size - 1 && list->array[i + 1] == key; ++i)
+    {
+    }
+    // at the point, i is at size, or at last instance of key
+
+    for (; i < list->size - 1; ++i)
+        list->array[i] = list->array[i + 1];
+
+    if (i == list->size - 1)
+        --list->size;
+
+    printf("index: %zu\n", i);
 }
 
 void resize_if_full(ArrayList *list)
@@ -66,6 +85,8 @@ void resize_if_full(ArrayList *list)
     {
         list->capacity *= 2;
         list->array = realloc(list->array, list->capacity * sizeof(int)); // `capacity` is like the number of elements. we need to multiply by the sizeof(int) to get the true number of bytes that need to be allocateted
+
+        // realloc takes a pointer to existting allocated memory, and resizes it
     }
 }
 

@@ -3,33 +3,53 @@
 #include <stdbool.h>
 #include <string.h>
 
-int q1(int n);
-int q2(int n);
-bool q3(char *str, int start, int end);
-char *q5(char *str, int n);
-int q4(char *str);
+int coin_flip(int n);
+int dice_roll(int n);
+bool palindrome(char *str, int start, int end);
+char *caesar_shift(char *str, int n);
+int lowest_base(char *str);
 bool isPalindrome(char *str);
 
 void showArray(int arr[], size_t size);
 
 int main(void)
 {
-    // int res1 = q1(10);
-    // printf("0s: %d\n", res1);
+    srand(42);
+    int q1_result = coin_flip(10);
+    int q1_result_1 = coin_flip(20);
+    printf("[test 1] (10 flips) 0s: %d\n", q1_result);
+    printf("[test 2] (20 flips) 0s: %d\n", q1_result_1);
 
-    // int res2 = q2(2);
-    // printf("rolls required: %d\n", res2);
+    puts("");
+    int q2_result = dice_roll(2);
+    int q2_result_1 = dice_roll(5);
+    printf("[test 1] (2 dice) Rolls required: %d\n", q2_result);
+    printf("[test 2] (5 dice) Rolls required: %d\n", q2_result_1);
 
-    // bool res3 = isPalindrome("ganninnag");
-    // printf("%d\n", res3);
-    char *res5 = q5("xyz", 1);
-    puts(res5);
+    puts("");
+    bool q3_result = isPalindrome("ganninnag");
+    bool q3_result_1 = isPalindrome("ganninnfag");
+    printf("[test 1] (`ganninnag`) Is palindrome: %s\n", q3_result == 1 ? "true" : "false");
+    printf("[test 2] (`ganninnfag`) Is palindrome: %s\n", q3_result_1 == 1 ? "true" : "false");
 
-    // int res4 = q4("38CP");
+    puts("");
+    int q4_result = lowest_base("1010");
+    int q4_result_1 = lowest_base("Z5");
+    printf("[test 1] (`1010`) Lowest base: %d\n", q4_result);
+    printf("[test 2] (`Z5`) Lowest base: %d\n", q4_result_1);
+
+    puts("");
+    char *q5_result = caesar_shift("xyz", 1);
+    char *q5_result_1 = caesar_shift("abc", 4);
+    printf("[test 1] (`xyz`, 1) Shifted: %s\n", q5_result);
+    printf("[test 2] (`abc`, 25) Shifted: %s\n", q5_result_1);
+    free(q5_result);
+    free(q5_result_1);
+
     return 0;
 }
 
-int q4(char *str)
+int lowest_base(char *str)
 {
     size_t length = strlen(str);
     int max = str[0];
@@ -48,12 +68,14 @@ int q4(char *str)
     return max;
 }
 
-char *q5(char *str, int n)
+char *caesar_shift(char *str, int n)
 {
     // this function will print the letters out correctly, but will not return the string
-
     int index = 0;
     char current_char = str[index];
+    char *final = malloc(sizeof(str) * strlen(str));
+
+    strcpy(final, str);
 
     while (current_char != 0)
     {
@@ -63,12 +85,11 @@ char *q5(char *str, int n)
         while (temp >= 123)
             temp -= 26; // gets the letter back in the alphabet range
 
-        temp -= 32; // lowercase - 32 = uppercase
-        // final_result[index] = temp; // this line causes a error idk why
-        printf("index %d: %c\n", index, temp);
+        temp -= 32;                // lowercase - 32 = uppercase
+        final[index] = (char)temp; // this line causes a error idk why
         current_char = str[++index];
     }
-    return str;
+    return final;
 }
 
 bool isPalindrome(char *str)
@@ -78,10 +99,10 @@ bool isPalindrome(char *str)
     if (length == 0)
         return true;
 
-    return q3(str, 0, length - 1);
+    return palindrome(str, 0, length - 1);
 }
 
-bool q3(char *str, int start, int end)
+bool palindrome(char *str, int start, int end)
 {
     // Write a recursive function that determines if a string is a palindrome and returns True or False.
     if (str[start] != str[end])
@@ -90,13 +111,12 @@ bool q3(char *str, int start, int end)
         return true;
 
     // printf("called\n");
-    return q3(str, ++start, --end);
+    return palindrome(str, ++start, --end);
 }
 
-int q1(int n)
+int coin_flip(int n)
 {
     // Seed the RNG with 42. Write a function that flips a coin (0 or 1) n times and returns the number of 0s rolled.
-    srand(42);
     int results[2] = {0, 0};
     for (size_t i = 0; i < n; ++i)
     {
@@ -107,7 +127,7 @@ int q1(int n)
     return results[0];
 }
 
-int q2(int n)
+int dice_roll(int n)
 {
     // Seed the RNG with 42. Write a function that rolls n 6-sided dice and returns the number of rolls required until they all match.
     int dice_results[n];
@@ -122,9 +142,10 @@ int q2(int n)
             int num = rand() % 6 + 1;
             dice_results[i] = num;
         }
-        showArray(dice_results, n);
 
         counter++;
+
+        // showArray(dice_results, sizeof(dice_results) / sizeof(dice_results[0]));
         for (size_t i = 1; i < n; ++i)
         {
             int sample = dice_results[0]; // first element of array to check if all are equal

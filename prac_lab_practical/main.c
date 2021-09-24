@@ -40,9 +40,9 @@ int main(void)
 
     puts("");
     char *q5_result = caesar_shift("xyz", 1);
-    char *q5_result_1 = caesar_shift("abc", 4);
+    char *q5_result_1 = caesar_shift("abc", 23);
     printf("[test 1] (`xyz`, 1) Shifted: %s\n", q5_result);
-    printf("[test 2] (`abc`, 25) Shifted: %s\n", q5_result_1);
+    printf("[test 2] (`abc`, 3) Shifted: %s\n", q5_result_1);
     free(q5_result);
     free(q5_result_1);
 
@@ -80,12 +80,17 @@ char *caesar_shift(char *str, int n)
     while (current_char != 0)
     {
         char temp = str[index];
-        temp += n;
+        while (temp + n > 127)
+            temp -= 26;
 
-        while (temp >= 123)
-            temp -= 26; // gets the letter back in the alphabet range
+        temp = temp + n;
+        if (temp > 'z')
+        {
+            temp = temp - 'z' + 'a' - 1;
 
-        temp -= 32;                // lowercase - 32 = uppercase
+        } // gets the letter back in the alphabet range
+        // printf("temp: %c\n", temp);
+        temp = temp - 32;          // lowercase - 32 = uppercase
         final[index] = (char)temp; // this line causes a error idk why
         current_char = str[++index];
     }

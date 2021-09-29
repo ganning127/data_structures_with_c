@@ -15,10 +15,10 @@ void showArray(int arr[], size_t size);
 int main(void)
 {
     srand(42);
-    int q1_result = coin_flip(10);
-    int q1_result_1 = coin_flip(20);
-    printf("[test 1] (10 flips) 0s: %d\n", q1_result);
-    printf("[test 2] (20 flips) 0s: %d\n", q1_result_1);
+    int q1_result = coin_flip(2);
+    int q1_result_1 = coin_flip(10);
+    printf("[test 1] (2 flips) 0s: %d\n", q1_result);
+    printf("[test 2] (10 flips) 0s: %d\n", q1_result_1);
 
     puts("");
     int q2_result = dice_roll(2);
@@ -40,7 +40,7 @@ int main(void)
 
     puts("");
     char *q5_result = caesar_shift("xyz", 1);
-    char *q5_result_1 = caesar_shift("abc", 23);
+    char *q5_result_1 = caesar_shift("abc", 3);
     printf("[test 1] (`xyz`, 1) Shifted: %s\n", q5_result);
     printf("[test 2] (`abc`, 3) Shifted: %s\n", q5_result_1);
     free(q5_result);
@@ -81,16 +81,16 @@ char *caesar_shift(char *str, int n)
     {
         char temp = str[index];
         while (temp + n > 127)
-            temp -= 26;
-
+          temp -= 26;
+          
+        
         temp = temp + n;
-        if (temp > 'z')
-        {
-            temp = temp - 'z' + 'a' - 1;
-
+        if(temp > 'z'){
+          temp = temp - 'z' + 'a' - 1;
+          
         } // gets the letter back in the alphabet range
         // printf("temp: %c\n", temp);
-        temp = temp - 32;          // lowercase - 32 = uppercase
+        temp = temp - 32;                // lowercase - 32 = uppercase
         final[index] = (char)temp; // this line causes a error idk why
         current_char = str[++index];
     }
@@ -135,6 +135,8 @@ int coin_flip(int n)
 int dice_roll(int n)
 {
     // Seed the RNG with 42. Write a function that rolls n 6-sided dice and returns the number of rolls required until they all match.
+    if (n == 1)
+     return n;
     int dice_results[n];
     int completed = 0; // 0 = false; 1 = true
     int counter = 0;

@@ -27,7 +27,7 @@ int main(void)
     printf("perfect number: %s\n", p3_res == 1 ? "true" : "false");
     puts("");
 
-    double p4_res = p4("3.14"); // you can change this to test for different cases
+    double p4_res = p4("69420"); // you can change this to test for different cases
     printf("double %f\n", p4_res);
     puts("");
 

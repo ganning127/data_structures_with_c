@@ -28,7 +28,7 @@ int main(void)
 
     al_delete(nu, 1);
 
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 100; ++i)
         al_insert(nu, i);
     printf("size: %zu \ncapacity: %zu\n", nu->size, nu->capacity);
     al_print(nu);
@@ -92,6 +92,7 @@ void resize_if_full(ArrayList *list)
 
 void al_destroy(ArrayList **listPtr)
 {
+    // constant time, very fast
     ArrayList *list = *listPtr;
     free(list->array);
     free(list);

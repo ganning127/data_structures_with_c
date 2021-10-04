@@ -40,14 +40,6 @@ int main(void)
     print(q);
     puts("");
 
-    printf("Clearing Queue...\n");
-    clear(q);
-
-    printf("After cleaning Queue: ");
-    print(q);
-
-    puts("");
-
     printf("adding 'E' to queue...\n");
     push(q, 'E');
 
@@ -57,7 +49,6 @@ int main(void)
     printf("clearing queue...\n");
     clear(q);
 
-    free(q);
     return 0;
 }
 
@@ -68,6 +59,7 @@ QueuePtr create()
     new_queue->end = NULL;
     return new_queue;
 }
+
 void push(QueuePtr queue, char c)
 {
     NodePtr nu = malloc(sizeof(Node));
@@ -97,7 +89,9 @@ char pop(QueuePtr queue)
 
 char peek(QueuePtr queue)
 {
-    return queue->start->key;
+    if (queue->start)
+        return queue->start->key;
+    return '\0';
 }
 
 void print(QueuePtr queue)
@@ -118,11 +112,47 @@ void print(QueuePtr queue)
         puts("END");
     }
     else
-        puts("The queue is empty.");
+        puts("END");
 }
 
 void clear(QueuePtr queue)
 {
+    if (queue->start)
+    {
+        if (queue->start == queue->end) // only 1 element in the queue
+        {
+            free(queue->start);
+        }
+        else // the queue contains multiple elements
+        {
+            NodePtr node = queue->start;
+            NodePtr next;
+            for (; node != NULL; node = next)
+            {
+                next = node->next;
+                free(node);
+            }
+
+            // NodePtr node = queue->start;
+            // NodePtr next;
+            // for (; node != NULL; node = node->next)
+            // {
+            //     // next = node->next;
+            //     free(node);
+            // }
+
+            /*
+            // destroy the rest of the list
+            queue->start = queue->start->next;
+
+            clear(queue);
+            free(queue->start); // free the memory created in malloc
+            */
+        }
+    }
+    free(queue);
+
+    /*
     if (queue->start == queue->end && queue->start != NULL)
     {
         // there is only one node in the list
@@ -136,5 +166,6 @@ void clear(QueuePtr queue)
         clear(queue);
         free(queue->start); // free the memory created in malloc
     }
-    queue->start = queue->end = NULL;
+*/
+    // queue->start = queue->end = NULL;
 }

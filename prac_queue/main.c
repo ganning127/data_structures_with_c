@@ -40,12 +40,20 @@ int main(void)
     print(q);
     puts("");
 
-    printf("adding 'E' to queue...\n");
-    push(q, 'E');
+    printf("Clearing Queue...\n");
+    clear(q);
 
-    printf("Ending Queue: ");
+    printf("After cleaning Queue: ");
     print(q);
 
+    puts("");
+
+    printf("adding 'E' to queue...\n");
+    push(q, 'E');
+    printf("after adding 'E' Queue: ");
+    print(q);
+
+    puts("");
     printf("clearing queue...\n");
     clear(q);
 
@@ -132,40 +140,9 @@ void clear(QueuePtr queue)
                 next = node->next;
                 free(node);
             }
-
-            // NodePtr node = queue->start;
-            // NodePtr next;
-            // for (; node != NULL; node = node->next)
-            // {
-            //     // next = node->next;
-            //     free(node);
-            // }
-
-            /*
-            // destroy the rest of the list
-            queue->start = queue->start->next;
-
-            clear(queue);
-            free(queue->start); // free the memory created in malloc
-            */
         }
     }
-    free(queue);
+    queue->start = queue->end = NULL;
 
-    /*
-    if (queue->start == queue->end && queue->start != NULL)
-    {
-        // there is only one node in the list
-        free(queue->start);
-    }
-    else if (queue->start != NULL)
-    {
-        // destroy the rest of the list
-        queue->start = queue->start->next;
-
-        clear(queue);
-        free(queue->start); // free the memory created in malloc
-    }
-*/
-    // queue->start = queue->end = NULL;
+    // free(queue) to make sure all memory is freed
 }

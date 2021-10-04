@@ -3,78 +3,138 @@
 
 typedef struct node
 {
-    int key;           // value
+    char key;          // value
     struct node *next; // pointer to the next element
 } Node;
-
 typedef Node *NodePtr;
 
-void q_push(NodePtr *list, int key);
-void q_pop(NodePtr *list);
-int q_peek(NodePtr *list);
-void llprint(NodePtr node);
+typedef struct queue
+{
+    NodePtr start;
+    NodePtr end;
+} Queue;
+typedef Queue *QueuePtr;
+
+QueuePtr create();
+void push(QueuePtr queue, char c);
+void print(QueuePtr queue);
+char pop(QueuePtr queue);
+char peek(QueuePtr queue);
+void clear(QueuePtr queue);
 
 int main(void)
 {
-    Node *list = NULL;
-    q_push(&list, 1);
-    q_push(&list, 2);
-    q_pop(&list);
-    q_push(&list, 3);
-    q_push(&list, 1124142);
-    printf("peeking: %d\n", q_peek(&list));
+    // i don't know why it says we lost 16 bytes when there are 5 mallocs and 5 frees
+    QueuePtr q = create();
+    push(q, 'A');
+    push(q, 'B');
+    push(q, 'D');
 
-    llprint(list);
+    printf("Current Queue: ");
+    print(q);
+
+    puts("");
+
+    printf("Popped: %c\n", pop(q));
+    printf("After popping Queue: ");
+    print(q);
+    puts("");
+
+    printf("Clearing Queue...\n");
+    clear(q);
+
+    printf("After cleaning Queue: ");
+    print(q);
+
+    puts("");
+
+    printf("adding 'E' to queue...\n");
+    push(q, 'E');
+
+    printf("Ending Queue: ");
+    print(q);
+
+    printf("clearing queue...\n");
+    clear(q);
+
+    free(q);
     return 0;
 }
 
-void q_push(NodePtr *list, int key)
+QueuePtr create()
 {
-    NodePtr node = *list;
-    if (node == NULL)
+    QueuePtr new_queue = malloc(sizeof(Queue));
+    new_queue->start = NULL;
+    new_queue->end = NULL;
+    return new_queue;
+}
+void push(QueuePtr queue, char c)
+{
+    NodePtr nu = malloc(sizeof(Node));
+    nu->key = c;
+    nu->next = NULL;
+
+    if (queue->end == NULL)
     {
-        // insert here
-        NodePtr nu = malloc(sizeof(Node));
-        nu->key = key;
-        nu->next = NULL;
-        *list = nu;
+        queue->start = nu;
+        queue->end = nu;
     }
-    else
-        q_push(&(node->next), key);
+
+    queue->end->next = nu;
+    queue->end = nu;
 }
 
-void q_pop(NodePtr *list)
+char pop(QueuePtr queue)
 {
-    NodePtr node = *list;
-    if (node != NULL)
-    {
-        *list = node->next;
-        free(node);
-    }
-    else
-        printf("There are no nodes in this list.\n");
+    NodePtr head_node = queue->start;
+    char head_char = head_node->key;
+
+    queue->start = head_node->next;
+    free(head_node);
+
+    return head_char;
 }
 
-int q_peek(NodePtr *list)
+char peek(QueuePtr queue)
 {
-    NodePtr node = *list;
-    if (node != NULL)
-        return (*list)->key;
-    else
-    {
-        printf("There are no nodes in this list.\n");
-        return -1;
-    }
+    return queue->start->key;
 }
 
-void llprint(NodePtr node)
+void print(QueuePtr queue)
 {
-    // base case is when node is NULL
-    if (node != NULL)
+    if (queue->start == queue->end && queue->start != NULL)
     {
-        printf("%d -> ", node->key);
-        llprint(node->next);
-    }
-    else
+        printf("%c -> ", queue->start->key);
         puts("END");
+    }
+    else if (queue->start != NULL)
+    {
+        NodePtr node = queue->start;
+        while (node != NULL)
+        {
+            printf("%c -> ", node->key);
+            node = node->next;
+        }
+        puts("END");
+    }
+    else
+        puts("The queue is empty.");
+}
+
+void clear(QueuePtr queue)
+{
+    if (queue->start == queue->end && queue->start != NULL)
+    {
+        // there is only one node in the list
+        free(queue->start);
+    }
+    else if (queue->start != NULL)
+    {
+        // destroy the rest of the list
+        queue->start = queue->start->next;
+
+        clear(queue);
+        free(queue->start); // free the memory created in malloc
+    }
+    queue->start = queue->end = NULL;
 }

@@ -2,20 +2,135 @@
 #include <stdlib.h>
 #define INITIAL_CAPACITY 8
 
-typedef struct arraylist
+typedef struct stack
 {
-    int *array;      // declared as pointer so we don't need to specify size
+    char *array;     // declared as pointer so we don't need to specify size
     size_t size;     // how many elements its currently holding
     size_t capacity; // how many elements it can hold
-} ArrayList;
+} Stack;
+typedef Stack *StackPtr;
 
-void resize_if_full(ArrayList *list);
-void s_print(ArrayList *list);
-ArrayList *al_create();
-void s_push(ArrayList *list, int key);
-void s_pop(ArrayList *list);
-int s_peek(ArrayList *list);
-void s_destroy(ArrayList **listPtr);
+void resize_if_full(StackPtr list);
+StackPtr create();
+void push(StackPtr stack, char c);
+void print(StackPtr stack);
+char pop(StackPtr stack);
+char peek(StackPtr stack);
+void clear(StackPtr stack);
+void destroy(StackPtr stack);
+void showArray(int arr[], size_t size);
+
+int main(void)
+{
+    StackPtr s = create();
+    push(s, 'A');
+    push(s, 'B');
+    push(s, 'C');
+
+    printf("original stack: ");
+    print(s);
+
+    puts("");
+
+    printf("popped: %c\n", pop(s));
+    printf("peeking: %c\n", peek(s));
+    printf("after pop and peeking stack: ");
+    print(s);
+
+    puts("");
+
+    printf("clearing stack...\n");
+    clear(s);
+    printf("after clearing stack: ");
+    print(s);
+
+    puts("");
+    printf("adding 'D' and 'E' to stack...\n");
+    push(s, 'D');
+    push(s, 'E');
+    printf("after adding more letters stack: ");
+    print(s);
+
+    puts("");
+    printf("clearing stack...\n");
+    clear(s);
+    print(s);
+
+    destroy(s); // freeing all memory
+}
+
+StackPtr create()
+{
+    StackPtr nu = malloc(sizeof(Stack)); // allocate memory for the struct itself
+    nu->size = 0;
+    nu->capacity = INITIAL_CAPACITY;
+
+    nu->array = calloc(nu->capacity, sizeof(char)); // setting elements in the array to 0
+
+    return nu;
+}
+
+void push(StackPtr stack, char c)
+{
+    resize_if_full(stack);
+    size_t i;
+    for (i = stack->size++; i > 0; --i)
+    {
+        // shifts all elements towards the end by 1 index;
+        stack->array[i] = stack->array[i - 1];
+    }
+    stack->array[0] = c;
+}
+
+char peek(StackPtr stack)
+{
+    return stack->array[0];
+}
+
+char pop(StackPtr stack)
+{
+    // removes the head
+    char head_char = stack->array[0];
+    for (size_t i = 0; i < stack->size; ++i)
+    {
+        stack->array[i] = stack->array[i + 1];
+    }
+    stack->size--;
+
+    return head_char;
+}
+
+void resize_if_full(StackPtr stack)
+{
+    if (stack->size == stack->capacity)
+    {
+        stack->capacity *= 2;
+        stack->array = realloc(stack->array, stack->capacity * sizeof(char)); // `capacity` is like the number of elements. we need to multiply by the sizeof(int) to get the true number of bytes that need to be allocateted
+    }
+}
+
+void print(StackPtr stack)
+{
+    for (size_t i = 0; i < stack->size; ++i)
+    {
+        printf("%c, ", stack->array[i]);
+    }
+    puts("END");
+}
+
+void clear(StackPtr stack)
+{
+    stack->size = 0;
+    stack->capacity = INITIAL_CAPACITY;
+    stack->array = realloc(stack->array, stack->capacity * sizeof(char));
+}
+
+void destroy(StackPtr stack)
+{
+    free(stack->array);
+    free(stack);
+}
+
 void showArray(int arr[], size_t size)
 {
     // prints the array to screen
@@ -25,88 +140,4 @@ void showArray(int arr[], size_t size)
     }
 
     printf("\n");
-}
-
-int main(void)
-{
-    ArrayList *nu = al_create();
-    s_push(nu, 1);
-    s_push(nu, 2);
-    s_push(nu, 3);
-    s_pop(nu);
-
-    printf("peeking: %d\n", s_peek(nu));
-    s_print(nu);
-
-    s_destroy(&nu);
-}
-
-int s_peek(ArrayList *list)
-{
-    return list->array[0];
-}
-
-void s_pop(ArrayList *list)
-{
-    // removes the head
-    for (size_t i = 0; i < list->size; ++i)
-    {
-        list->array[i] = list->array[i + 1];
-    }
-    list->size--;
-}
-
-void s_push(ArrayList *list, int key)
-{
-    resize_if_full(list);
-    size_t i;
-    for (i = list->size++; i > 0; --i)
-    {
-        // shifts all elements towards the end by 1 index;
-        list->array[i] = list->array[i - 1];
-    }
-    list->array[0] = key;
-}
-
-void resize_if_full(ArrayList *list)
-{
-    if (list->size == list->capacity)
-    {
-        list->capacity *= 2;
-        list->array = realloc(list->array, list->capacity * sizeof(int)); // `capacity` is like the number of elements. we need to multiply by the sizeof(int) to get the true number of bytes that need to be allocateted
-
-        // realloc takes a pointer to existting allocated memory, and resizes it
-    }
-}
-
-void s_print(ArrayList *list)
-{
-    for (size_t i = 0; i < list->size; ++i)
-    {
-        printf("%d, ", list->array[i]);
-    }
-    puts("");
-}
-
-ArrayList *al_create()
-{
-    ArrayList *nu = malloc(sizeof(ArrayList)); // allocate memory for the struct itself
-    nu->size = 0;
-    nu->capacity = INITIAL_CAPACITY;
-
-    nu->array = calloc(nu->capacity, sizeof(int)); // setting elements in the array to 0
-    /*
-        calloc = malloc, but sets all elements equal to zero
-    */
-
-    return nu;
-}
-
-void s_destroy(ArrayList **listPtr)
-{
-    // constant time, very fast
-    ArrayList *list = *listPtr;
-    free(list->array);
-    free(list);
-    *listPtr = NULL; // since the array has been free'd, set its pionter to null
 }

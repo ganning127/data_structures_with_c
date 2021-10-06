@@ -55,8 +55,6 @@ int main(void)
     printf("clearing stack...\n");
     clear(s);
     print(s);
-
-    destroy(s); // freeing all memory
 }
 
 StackPtr create()
@@ -122,13 +120,7 @@ void clear(StackPtr stack)
 {
     stack->size = 0;
     stack->capacity = INITIAL_CAPACITY;
-    stack->array = realloc(stack->array, stack->capacity * sizeof(char));
-}
-
-void destroy(StackPtr stack)
-{
-    free(stack->array);
-    free(stack);
+    // stack->array = realloc(stack->array, stack->capacity * sizeof(char));
 }
 
 void showArray(int arr[], size_t size)

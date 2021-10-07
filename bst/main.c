@@ -15,15 +15,22 @@ void print_bst(NodePtr bst);
 void insert_bst(NodePtr *bstPtr, int key);
 void destroy_bst(NodePtr *bstPtr);
 void delete_bst(NodePtr *bstPtr, int key);
+NodePtr *successor_bst(NodePtr *treePtr);
 
 int main(void)
 {
     NodePtr bst = NULL; // we do not need to keep track of how many elements there are, only need a pointer to the first node
-    insert_bst(&bst, 46);
+    insert_bst(&bst, 42);
     insert_bst(&bst, 100);
     insert_bst(&bst, 6);
     insert_bst(&bst, 4);
     insert_bst(&bst, 3);
+    insert_bst(&bst, 7);
+    print_bst(bst);
+
+    puts("-------");
+    delete_bst(&bst, 42);
+
     print_bst(bst);
     destroy_bst(&bst);
 }
@@ -97,7 +104,19 @@ void delete_bst(NodePtr *bstPtr, int key)
         // has one child
         if (bst->left != NULL && bst->right != NULL)
         {
-            // children
+            // go down to the right subtree, and go left all the way (closest value to the top node)
+            //      move the leftmost node to the pos of the removed element
+            //
+            // go down to the left subtree, and go right all the way (closest value to the top node)
+
+            NodePtr *successorPtr = successor_bst(&(bst->right)); // left mode node of the right subtree
+
+            newPtr = *successorPtr;        // deref to get successor
+            *successorPtr = newPtr->right; // promote the right child to where the deleted node is
+
+            // copy original nodes childrent to successor
+            newPtr->right = bst->right;
+            newPtr->left = bst->left;
         }
         else
         {
@@ -110,7 +129,12 @@ void delete_bst(NodePtr *bstPtr, int key)
     }
 }
 
-// go down to the right subtree, and go left all the way (closest value to the top node)
-//      move the leftmost node to the pos of the removed element
-//
-// go down to the left subtree, and go right all the way (closest value to the top node)
+NodePtr *successor_bst(NodePtr *treePtr)
+{
+    NodePtr tree = *treePtr;
+    if (tree->left == NULL)
+    {
+        return treePtr;
+    }
+    return successor_bst(&(tree->left));
+}

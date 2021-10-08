@@ -35,6 +35,9 @@ int main(void)
 
     puts("");
 
+    printf("Peeking: %c\n", peek(q));
+    puts("");
+
     printf("Popped: %c\n", pop(q));
     printf("After popping Queue: ");
     print(q);
@@ -56,12 +59,14 @@ int main(void)
     puts("");
     printf("clearing queue...\n");
     clear(q);
-
+    // uncomment the below line to free all memory
+    // free(q);
     return 0;
 }
 
 QueuePtr create()
 {
+    // creates a new queue
     QueuePtr new_queue = malloc(sizeof(Queue));
     new_queue->start = NULL;
     new_queue->end = NULL;
@@ -70,6 +75,7 @@ QueuePtr create()
 
 void push(QueuePtr queue, char c)
 {
+    // adds element to the end of the queue
     NodePtr nu = malloc(sizeof(Node));
     nu->key = c;
     nu->next = NULL;
@@ -86,20 +92,38 @@ void push(QueuePtr queue, char c)
 
 char pop(QueuePtr queue)
 {
-    NodePtr head_node = queue->start;
-    char head_char = head_node->key;
+    // deletes and returns the head element
+    char head_char = '\0'; // in case there isn't a queue made yet
+    if (queue->start)
+    {
+        NodePtr head_node = queue->start;
+        head_char = head_node->key;
 
-    queue->start = head_node->next;
-    free(head_node);
+        queue->start = head_node->next;
+        free(head_node);
+    }
 
     return head_char;
 }
 
 char peek(QueuePtr queue)
 {
+    // returns the head element
     if (queue->start)
         return queue->start->key;
     return '\0';
+}
+
+void llprint(NodePtr node)
+{
+    // `llprint()` is a helper function that prints
+    if (node != NULL)
+    {
+        printf("%c -> ", node->key);
+        llprint(node->next);
+    }
+    else
+        puts("END");
 }
 
 void print(QueuePtr queue)
@@ -112,12 +136,7 @@ void print(QueuePtr queue)
     else if (queue->start != NULL)
     {
         NodePtr node = queue->start;
-        while (node != NULL)
-        {
-            printf("%c -> ", node->key);
-            node = node->next;
-        }
-        puts("END");
+        llprint(node);
     }
     else
         puts("END");
@@ -125,6 +144,7 @@ void print(QueuePtr queue)
 
 void clear(QueuePtr queue)
 {
+    // deletes all nodes in the queue
     if (queue->start)
     {
         if (queue->start == queue->end) // only 1 element in the queue

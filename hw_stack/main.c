@@ -17,7 +17,7 @@ void print(StackPtr stack);
 char pop(StackPtr stack);
 char peek(StackPtr stack);
 void clear(StackPtr stack);
-void destroy(StackPtr stack);
+
 void showArray(int arr[], size_t size);
 
 int main(void)
@@ -55,10 +55,14 @@ int main(void)
     printf("clearing stack...\n");
     clear(s);
     print(s);
+    // uncomment the below lines to free all memory
+    // free(s);
+    // free(s->array);
 }
 
 StackPtr create()
 {
+    // creates the stack
     StackPtr nu = malloc(sizeof(Stack)); // allocate memory for the struct itself
     nu->size = 0;
     nu->capacity = INITIAL_CAPACITY;
@@ -70,6 +74,7 @@ StackPtr create()
 
 void push(StackPtr stack, char c)
 {
+    // inserts to the head of stack
     resize_if_full(stack);
     size_t i;
     for (i = stack->size++; i > 0; --i)
@@ -87,7 +92,7 @@ char peek(StackPtr stack)
 
 char pop(StackPtr stack)
 {
-    // removes the head
+    // removes the head and returns the first value
     char head_char = stack->array[0];
     for (size_t i = 0; i < stack->size; ++i)
     {
@@ -109,6 +114,7 @@ void resize_if_full(StackPtr stack)
 
 void print(StackPtr stack)
 {
+    // shows stack
     for (size_t i = 0; i < stack->size; ++i)
     {
         printf("%c, ", stack->array[i]);
@@ -118,6 +124,7 @@ void print(StackPtr stack)
 
 void clear(StackPtr stack)
 {
+    // deletes all nodes in the stack
     stack->size = 0;
     stack->capacity = INITIAL_CAPACITY;
     // stack->array = realloc(stack->array, stack->capacity * sizeof(char));

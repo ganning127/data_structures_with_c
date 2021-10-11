@@ -28,7 +28,10 @@ void destroy_bst(NodePtr *bstPtr);
 void delete_bst(NodePtr *bstPtr, int key);
 NodePtr *successor_bst(NodePtr *treePtr);
 size_t size_bst(NodePtr bst);
-//
+NodePtr merge_bst(NodePtr treeA, NodePtr treeB);
+int *bst_to_list(NodePtr tree);
+int *bst_merge_lists(int *listA, int *listB, size_t sizeA, size_t sizeB);
+
 int main(void)
 {
     NodePtr bst = NULL; // we do not need to keep track of how many elements there are, only need a pointer to the first node
@@ -39,20 +42,19 @@ int main(void)
     // insert_bst(&bst, 3);
     // insert_bst(&bst, 7);
     // insert_bst(&bst, 100);
-    insert_bst(&bst, 1);
-    insert_bst(&bst, 2);
     insert_bst(&bst, 3);
-    insert_bst(&bst, 4);
-    insert_bst(&bst, 5);
     insert_bst(&bst, 6);
+    insert_bst(&bst, 1);
+    insert_bst(&bst, 42);
+    insert_bst(&bst, 100);
 
     print_bst(bst);
-    delete_bst(&bst, 42);
-    puts("-------");
 
-    printf("size: %zu\n", size_bst(bst));
-    puts("-------");
-    print_bst(bst);
+    int *list = bst_to_list(bst);
+    for (size_t i = 0; i < 5; ++i)
+        printf("%d ", list[i]);
+
+    puts("");
     destroy_bst(&bst);
 }
 
@@ -68,7 +70,6 @@ void insert_bst(NodePtr *bstPtr, int key)
 
         Best: O(log(n))
             When the BST is balanced, the time complexity is O(log(n)), which is the best case senario. Doubling the number of elements in the tree only adds one iteration, which is the definition of a log(n) time complexity. 
-    
     */
 
     static unsigned int count = 0;
@@ -122,19 +123,9 @@ size_t size_bst(NodePtr bst)
             In the size function, you need to go through each node, which leads to a time complexity of O(n), because you need a new iteration for each elment. 
     */
 
-    static unsigned int count = 0;
     if (bst == NULL)
-    {
-        ++count;
-        printf("count: %u\n", count);
         return 0;
-    }
-    else
-    {
-        ++count;
-        printf("count: %u\n", count);
-        return 1 + size_bst(bst->left) + size_bst(bst->right);
-    }
+    return 1 + size_bst(bst->left) + size_bst(bst->right);
 }
 
 void destroy_bst(NodePtr *bstPtr)
@@ -219,3 +210,94 @@ NodePtr *successor_bst(NodePtr *treePtr)
     }
     return successor_bst(&(tree->left));
 }
+
+int *bst_to_list(NodePtr tree)
+{
+    static int *list = NULL;
+    if (tree == NULL)
+        return NULL;
+
+    size_t size = 0;
+    if (list == NULL)
+    {
+        // allocate space for list
+        // code only runs when at the root node
+        size = size_bst(tree);
+        list = calloc(size, sizeof(int));
+    }
+    bst_to_list(tree->left);
+    *list = tree->key;
+    ++list; // increment index of list
+    bst_to_list(tree->right);
+
+    if (size != 0)
+    {
+        int *out = list - size; // beginning of the array and copy the list
+        list = NULL;
+        return out;
+    }
+    else
+        return NULL;
+}
+
+NodePtr merge_bst(NodePtr treeA, NodePtr treeB)
+{
+    /*
+        merge tree a and b
+        a -> list a
+        b -> list b
+
+        merged = merge(a, b)
+
+        merge:
+            go through both trees at same time.
+            compare elements from each and take the smaller
+            from the tree that you took the element from, move the pointer to the next node
+        merged -> tree
+    */
+
+    int *listA = bst_to_list(treeA);
+    int *listB = bst_to_list(treeB);
+    size_t sizeA = size_bst(treeA);
+    size_t sizeB = size_bst(treeB);
+
+    int *merged = bst_merge_lists(listA, listB, sizeA, sizeB);
+
+    return NULL;
+}
+
+int *bst_merge_lists(int *listA, int *listB, size_t sizeA, size_t sizeB)
+{
+    int *merged = calloc(sizeA + sizeB, sizeof(int));
+    size_t i = 0, j = 0;
+    // i = listA
+    // b = listB
+
+    while (i < sizeA && j < sizeB)
+    {
+        if (listA[i] < listB[j])
+        {
+            merged[i + j] = listA[i];
+            ++i;
+        }
+        else
+        {
+            merged[i + j] = listB[j];
+            ++j;
+        }
+    }
+
+    // one of the lists are done
+    for (; i < sizeA; ++i)
+        merged[i + j] = listA[i];
+    for (; j < sizeA; ++i)
+        merged[i + j] = listB[j];
+
+    return merged;
+}
+
+/*
+    printing out BST in level order:
+        - https://www.google.com/search?q=binary+search+tree&sxsrf=AOaemvIXiGaEpHJGXa2h8gDt3zVr2Yi2IA:1633962273097&source=lnms&tbm=isch&sa=X&ved=2ahUKEwjcufTmx8LzAhXydd8KHWzJDDcQ_AUoAXoECAEQAw&biw=890&bih=1041&dpr=2#imgrc=0oeRvnU5P6AIoM
+    output: 8, 3, 1, 6, 4, 7, 10, 14, 13
+*/

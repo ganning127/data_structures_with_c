@@ -31,6 +31,8 @@ size_t size_bst(NodePtr bst);
 NodePtr merge_bst(NodePtr treeA, NodePtr treeB);
 int *bst_to_list(NodePtr tree);
 int *bst_merge_lists(int *listA, int *listB, size_t sizeA, size_t sizeB);
+int *bst_to_list_w_size(NodePtr tree, size_t size);
+NodePtr bst_list_to_tree_w_size(int *list, size_t size);
 
 int main(void)
 {
@@ -50,9 +52,10 @@ int main(void)
 
     print_bst(bst);
 
-    int *list = bst_to_list(bst);
-    for (size_t i = 0; i < 5; ++i)
-        printf("%d ", list[i]);
+    NodePtr merged = merge_bst(bst, bst);
+
+    puts("-----------");
+    print_bst(merged);
 
     puts("");
     destroy_bst(&bst);
@@ -69,7 +72,7 @@ void insert_bst(NodePtr *bstPtr, int key)
             When there are n elements in the BST, and there are also n levels, and therefore, and search would take n traversals. For example, inserting (1, 2, 3, 4, 5), in that order, would lead to worst case
 
         Best: O(log(n))
-            When the BST is balanced, the time complexity is O(log(n)), which is the best case senario. Doubling the number of elements in the tree only adds one iteration, which is the definition of a log(n) time complexity. 
+            When the BST is balanced, the time complexity is O(log(n)), which is the best case senario. Doubling the number of elements in the tree only adds one iteration, which is the definition of a log(n) time complexity.
     */
 
     static unsigned int count = 0;
@@ -97,7 +100,7 @@ void print_bst(NodePtr bst)
 {
     /*
         Avg, Best, Worst: O(n)
-            You need to go through each node in order to print it, resulting in a time complexity of O(n). 
+            You need to go through each node in order to print it, resulting in a time complexity of O(n).
     */
 
     static unsigned int depth = 0; // this line only runs once
@@ -120,7 +123,7 @@ size_t size_bst(NodePtr bst)
 {
     /*
         Avg, Best, Worst: O(n)
-            In the size function, you need to go through each node, which leads to a time complexity of O(n), because you need a new iteration for each elment. 
+            In the size function, you need to go through each node, which leads to a time complexity of O(n), because you need a new iteration for each elment.
     */
 
     if (bst == NULL)
@@ -151,12 +154,12 @@ void delete_bst(NodePtr *bstPtr, int key)
             Testing for (bst == NULL)
             Recursive call with half nodes
             Deleting the node
-    
+
         Worst: O(n)
             When the BST is unabalanced, you might need to go through each node in order to find the node that you want to delete, resulting in a time complexity of O(n).
 
         Best: O(log(n))
-            When the BST is balanced, the time complexity is O(log(n)), which is the best case senario. Doubling the number of elements in the tree only adds one iteration, which is the definition of a log(n) time complexity. 
+            When the BST is balanced, the time complexity is O(log(n)), which is the best case senario. Doubling the number of elements in the tree only adds one iteration, which is the definition of a log(n) time complexity.
 
     */
     NodePtr bst = *bstPtr;
@@ -240,6 +243,38 @@ int *bst_to_list(NodePtr tree)
         return NULL;
 }
 
+int *bst_to_list_w_size(NodePtr tree, size_t size)
+{
+    static int *list = NULL;
+    if (tree == NULL)
+    {
+        return NULL;
+    }
+
+    // creating the list and freeing memory
+    if (list == NULL)
+    {
+        list = calloc(size, sizeof(int));
+    }
+
+    bst_to_list_w_size(tree->left, 0);
+    *list++ = tree->key; // add key to the list, then increment to the next index
+
+    //++list;
+    // why increment list value? because just goes to next index
+    bst_to_list_w_size(tree->right, 0);
+
+    // We use the 0 as a flag to say that we aren't done yet. If we have 0, its still in a recursive function call. !=0 would mean that we are at the original fucntion call, or the end
+    if (size != 0)
+    {
+        int *out = list - size;
+        list = NULL;
+        return out;
+    }
+    else
+        return NULL;
+}
+
 NodePtr merge_bst(NodePtr treeA, NodePtr treeB)
 {
     /*
@@ -255,23 +290,24 @@ NodePtr merge_bst(NodePtr treeA, NodePtr treeB)
             from the tree that you took the element from, move the pointer to the next node
         merged -> tree
     */
-
-    int *listA = bst_to_list(treeA);
-    int *listB = bst_to_list(treeB);
     size_t sizeA = size_bst(treeA);
     size_t sizeB = size_bst(treeB);
+    int *listA = bst_to_list_w_size(treeA, sizeA);
+    int *listB = bst_to_list_w_size(treeB, sizeB);
 
     int *merged = bst_merge_lists(listA, listB, sizeA, sizeB);
 
-    return NULL;
+    NodePtr tree = bst_list_to_tree_w_size(merged, sizeA + sizeB);
+    free(listA);
+    free(listB);
+    free(merged);
+    return tree;
 }
 
 int *bst_merge_lists(int *listA, int *listB, size_t sizeA, size_t sizeB)
 {
     int *merged = calloc(sizeA + sizeB, sizeof(int));
     size_t i = 0, j = 0;
-    // i = listA
-    // b = listB
 
     while (i < sizeA && j < sizeB)
     {
@@ -301,3 +337,16 @@ int *bst_merge_lists(int *listA, int *listB, size_t sizeA, size_t sizeB)
         - https://www.google.com/search?q=binary+search+tree&sxsrf=AOaemvIXiGaEpHJGXa2h8gDt3zVr2Yi2IA:1633962273097&source=lnms&tbm=isch&sa=X&ved=2ahUKEwjcufTmx8LzAhXydd8KHWzJDDcQ_AUoAXoECAEQAw&biw=890&bih=1041&dpr=2#imgrc=0oeRvnU5P6AIoM
     output: 8, 3, 1, 6, 4, 7, 10, 14, 13
 */
+
+NodePtr bst_list_to_tree_w_size(int *list, size_t size)
+{
+    if (size == 0)
+        return NULL;
+
+    NodePtr root = malloc(sizeof(Node));
+    root->key = list[size / 2];
+    root->left = bst_list_to_tree_w_size(list, size / 2);
+    root->right = bst_list_to_tree_w_size(list + size / 2 + 1, (size - 1) / 2);
+
+    return root;
+}

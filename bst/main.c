@@ -19,8 +19,28 @@ typedef struct node
     struct node *right;
 
 } Node;
-
 typedef Node *NodePtr;
+
+typedef struct queue_node
+{
+    NodePtr key;             // node in BST
+    struct queue_node *next; // pointer to the next element
+} QueueNode;
+typedef QueueNode *QueueNodePtr;
+
+typedef struct queue
+{
+    QueueNodePtr start;
+    QueueNodePtr end;
+} Queue;
+typedef Queue *QueuePtr;
+
+QueuePtr create();
+void push(QueuePtr queue, NodePtr c);
+void print(QueuePtr queue);
+NodePtr pop(QueuePtr queue);
+NodePtr peek(QueuePtr queue);
+void clear(QueuePtr queue);
 
 void print_bst(NodePtr bst);
 void insert_bst(NodePtr *bstPtr, int key);
@@ -33,32 +53,63 @@ int *bst_to_list(NodePtr tree);
 int *bst_merge_lists(int *listA, int *listB, size_t sizeA, size_t sizeB);
 int *bst_to_list_w_size(NodePtr tree, size_t size);
 NodePtr bst_list_to_tree_w_size(int *list, size_t size);
+void print_in_level_order(NodePtr bst);
 
 int main(void)
 {
     NodePtr bst = NULL; // we do not need to keep track of how many elements there are, only need a pointer to the first node
-    // insert_bst(&bst, 42);
-    // insert_bst(&bst, 100);
-    // insert_bst(&bst, 6);
-    // insert_bst(&bst, 4);
-    // insert_bst(&bst, 3);
-    // insert_bst(&bst, 7);
-    // insert_bst(&bst, 100);
+
+    NodePtr bst1 = NULL;
+    NodePtr bst2 = NULL;
+
+    puts("bst:");
     insert_bst(&bst, 3);
     insert_bst(&bst, 6);
+    insert_bst(&bst, 2);
     insert_bst(&bst, 1);
     insert_bst(&bst, 42);
     insert_bst(&bst, 100);
-
     print_bst(bst);
-
-    NodePtr merged = merge_bst(bst, bst);
-
-    puts("-----------");
-    print_bst(merged);
+    print_in_level_order(bst);
 
     puts("");
+    puts("bst1:");
+    insert_bst(&bst1, 1);
+    insert_bst(&bst1, 2);
+    insert_bst(&bst1, 3);
+    insert_bst(&bst1, 4);
+    insert_bst(&bst1, 5);
+    insert_bst(&bst1, 6);
+    print_bst(bst1);
+    print_in_level_order(bst1);
+
+    puts("");
+    puts("bst2:");
+    insert_bst(&bst2, 7);
+    insert_bst(&bst2, 2);
+    insert_bst(&bst2, 1);
+    insert_bst(&bst2, 4);
+    insert_bst(&bst2, 3);
+    insert_bst(&bst2, 6);
+    insert_bst(&bst2, 11);
+    insert_bst(&bst2, 8);
+    insert_bst(&bst2, 13);
+    print_bst(bst2);
+    print_in_level_order(bst2);
+
+    NodePtr merged = merge_bst(bst, bst1);
+
+    puts("-------------------");
+    puts("merged: ");
+    print_bst(merged);
+    print_in_level_order(merged);
+
+    puts("");
+
     destroy_bst(&bst);
+    destroy_bst(&bst1);
+    destroy_bst(&bst2);
+    destroy_bst(&merged);
 }
 
 void insert_bst(NodePtr *bstPtr, int key)
@@ -332,12 +383,6 @@ int *bst_merge_lists(int *listA, int *listB, size_t sizeA, size_t sizeB)
     return merged;
 }
 
-/*
-    printing out BST in level order:
-        - https://www.google.com/search?q=binary+search+tree&sxsrf=AOaemvIXiGaEpHJGXa2h8gDt3zVr2Yi2IA:1633962273097&source=lnms&tbm=isch&sa=X&ved=2ahUKEwjcufTmx8LzAhXydd8KHWzJDDcQ_AUoAXoECAEQAw&biw=890&bih=1041&dpr=2#imgrc=0oeRvnU5P6AIoM
-    output: 8, 3, 1, 6, 4, 7, 10, 14, 13
-*/
-
 NodePtr bst_list_to_tree_w_size(int *list, size_t size)
 {
     if (size == 0)
@@ -349,4 +394,148 @@ NodePtr bst_list_to_tree_w_size(int *list, size_t size)
     root->right = bst_list_to_tree_w_size(list + size / 2 + 1, (size - 1) / 2);
 
     return root;
+}
+
+// QUEUE
+
+QueuePtr create()
+{
+    // creates a new queue
+    QueuePtr new_queue = malloc(sizeof(Queue));
+    new_queue->start = NULL;
+    new_queue->end = NULL;
+    return new_queue;
+}
+
+void push(QueuePtr queue, NodePtr c)
+{
+    // adds element to the end of the queue
+    QueueNodePtr nu = malloc(sizeof(Node));
+    nu->key = c;
+    nu->next = NULL;
+
+    if (queue->end == NULL)
+    {
+        queue->start = nu;
+        queue->end = nu;
+        return;
+    }
+
+    queue->end->next = nu;
+    queue->end = nu;
+}
+
+NodePtr pop(QueuePtr queue)
+{
+    // deletes and returns the head element
+    NodePtr head_char = NULL; // in case there isn't a queue made yet
+
+    if (queue->start != NULL)
+    {
+        QueueNodePtr node = queue->start;
+        head_char = node->key;
+        if (node->next == NULL)
+            queue->start = queue->end = NULL; // there was only one node in the list
+        else
+            queue->start = node->next; // set prev node to point to next node
+        free(node);
+    }
+
+    return head_char;
+}
+
+NodePtr peek(QueuePtr queue)
+{
+    // returns the head element
+    if (queue->start)
+        return queue->start->key;
+    return NULL;
+}
+
+void llprint(QueueNodePtr node)
+{
+    // `llprint()` is a helper function that prints
+    if (node != NULL)
+    {
+        printf("%d -> ", node->key->key);
+        llprint(node->next);
+    }
+    else
+        puts("END");
+}
+
+void print(QueuePtr queue)
+{
+    if (queue->start == queue->end && queue->start != NULL)
+    {
+        printf("%d -> ", queue->start->key->key);
+        puts("END");
+    }
+    else if (queue->start != NULL)
+    {
+        QueueNodePtr node = queue->start;
+        llprint(node);
+    }
+    else
+        puts("END");
+}
+
+void clear(QueuePtr queue)
+{
+    // deletes all nodes in the queue
+    if (queue->start)
+    {
+        if (queue->start == queue->end) // only 1 element in the queue
+        {
+            free(queue->start);
+        }
+        else // the queue contains multiple elements
+        {
+            QueueNodePtr node = queue->start;
+            QueueNodePtr next;
+            for (; node != NULL; node = next)
+            {
+                next = node->next;
+                free(node);
+            }
+        }
+    }
+    queue->start = queue->end = NULL;
+
+    // free(queue) to make sure all memory is freed
+}
+
+void level_printer(QueuePtr q)
+{
+    // pop off element
+    if (q->start == NULL)
+        return;
+    NodePtr curr_node = pop(q);
+    // print(q);
+    printf("%d ", curr_node->key);
+    // push left and right nodes
+    if (curr_node->left != NULL)
+        push(q, curr_node->left);
+
+    if (curr_node->right != NULL)
+        push(q, curr_node->right);
+
+    // print popped element
+
+    level_printer(q);
+}
+
+void print_in_level_order(NodePtr bst)
+{
+    if (bst == NULL)
+        return;
+
+    QueuePtr q = create();
+    push(q, bst);
+
+    level_printer(q);
+
+    clear(q);
+    free(q);
+    puts("");
 }

@@ -6,7 +6,8 @@ typedef struct arraylist
     unsigned int capacity; // value
     int *array;            // pointer to the next element
 } ArrayList;
-
+// it should be an array of struct pointers
+// each struct should contain key
 ArrayList *al_create();
 void al_destroy(ArrayList **listPtr);
 void al_print(ArrayList *list);

@@ -54,18 +54,6 @@ char *p4(char **stringPtr, char *strings[], size_t size)
     *stringPtr = out;
 }
 
-int main(void)
-{
-    char **p1_res = p1(10);
-
-    for (size_t i = 0; i < 10; ++i)
-        printf("%s ", p1_res[0]);
-
-    puts("");
-
-    return 0;
-}
-
 char *p5(NamePtr name)
 {
     size_t length = 1;
@@ -85,5 +73,43 @@ char *p5(NamePtr name)
     if (name->last)
         length += strlen(name->last);
 
-        return NULL;
+    char *out = calloc(length, sizeof(char));
+    if (name->first)
+    {
+        strcat(out, name->first); // null character comes immedielty
+        if (name->middle)
+        {
+            strcat(out, " ");
+        }
+    }
+    if (name->middle)
+    {
+        strcat(out, name->middle);
+        if (name->last)
+        {
+            strcat(out, " ");
+        }
+    }
+    if (name->last)
+        strcat(out, name->last);
+    return out;
+}
+
+int main(void)
+{
+    char **p1_res = p1(10);
+
+    for (size_t i = 0; i < 10; ++i)
+        printf("%s ", p1_res[0]);
+
+    puts("");
+
+    NamePtr name = malloc(sizeof(Name));
+
+    name->first = "Ganning";
+    name->middle = "Middle";
+    name->last = "Xu";
+    printf("%s\n", p5(name));
+
+    return 0;
 }

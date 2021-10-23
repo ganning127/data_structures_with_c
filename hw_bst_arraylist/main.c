@@ -15,7 +15,7 @@ typedef struct arraylist
 } ArrayList;
 // it should be an array of struct pointers
 // each struct should contain key
-ArrayList *al_create();
+ArrayList *bst_create();
 size_t bst_left_child(size_t index);
 size_t bst_right_child(size_t index);
 size_t bst_parent_index(size_t index);
@@ -28,26 +28,25 @@ void bst_insert(ArrayList *list, int key);
 void bst_delete(ArrayList *list, int key);
 void bst_destroy(ArrayList **listPtr);
 ArrayList *bst_merge(ArrayList *list1, ArrayList *list2);
+size_t bst_successor(ArrayList *list, size_t index);
 
 int main(void)
 {
-    ArrayList *nu = al_create();
+    ArrayList *nu = bst_create();
     bst_insert(nu, 4);
     bst_insert(nu, 3);
     bst_insert(nu, 5);
     bst_insert(nu, 2);
     bst_insert(nu, 6);
 
-    ArrayList *nu2 = al_create();
+    ArrayList *nu2 = bst_create();
     bst_insert(nu2, 9);
     bst_insert(nu2, 8);
     bst_insert(nu2, 10);
     bst_insert(nu2, 11);
     bst_insert(nu2, 6);
-    // print_pointers(nu);
-    // bst_print_level_order(nu);
 
-    ArrayList *nu3 = al_create();
+    ArrayList *nu3 = bst_create();
     bst_insert(nu3, 4);
     bst_insert(nu3, 3);
     bst_insert(nu3, 2);
@@ -59,22 +58,155 @@ int main(void)
     bst_insert(nu3, 10);
     bst_insert(nu3, 11);
 
-    ArrayList *merged = bst_merge(nu2, nu);
-    // bst_print_in_order(merged);
-    bst_print_level_order(merged);
+    puts("original trees");
+    puts("*************************");
+    puts("--------------------");
+    puts("nu");
+    puts("--------------------");
+    bst_print_tree(nu);
+
+    puts("--------------------");
+    puts("nu2");
+    puts("--------------------");
+    bst_print_tree(nu2);
+
+    puts("--------------------");
+    puts("nu3");
+    puts("--------------------");
+    bst_print_tree(nu3);
+    puts("*************************");
+
+    puts("");
+    puts("deleting nodes from trees...");
+    puts("");
+    bst_delete(nu3, 4);
+    bst_delete(nu2, 10);
+    bst_delete(nu, 6);
+
+    puts("modified trees");
+    puts("*************************");
+    puts("--------------------");
+    puts("nu");
+    puts("--------------------");
+    bst_print_tree(nu);
+
+    puts("--------------------");
+    puts("nu2");
+    puts("--------------------");
+    bst_print_tree(nu2);
+
+    puts("--------------------");
+    puts("nu3");
+    puts("--------------------");
+    bst_print_tree(nu3);
+    puts("*************************");
+
+    puts("");
+
+    puts("merging trees...");
+    puts("*************************");
+    ArrayList *merged = bst_merge(nu, nu2);
+    puts("--------------------");
+    puts("merged");
+    puts("--------------------");
     bst_print_tree(merged);
-    // bst_destroy(&nu);
+    puts("*************************");
+
+    puts("");
+    puts("destroying trees and freeing memory");
+    bst_destroy(&nu);
+    bst_destroy(&nu2);
+    bst_destroy(&nu3);
+    bst_destroy(&merged);
 
     free(nu);
-    printf("%p\n", nu);
-    bst_print_tree(nu3);
-
+    free(nu2);
+    free(nu3);
+    free(merged);
     return 0;
+}
+
+void bst_delete(ArrayList *list, int key)
+{
+    // if no children nodes, just delete current node
+    // if one children node, join the child node to the parent node
+    // if two children nodes, find the successor node and replace the current node with the successor node
+
+    // find the node to be deleted
+    size_t node_index = 0;
+
+    for (size_t i = 0; i < list->capacity; i++)
+    {
+        if (list->array[i] == NULL)
+            continue;
+        else if (list->array[i]->key == key)
+        {
+            // printf("list key: %d, key: %d\n", list->array[i]->key, key);
+            node_index = i;
+            break;
+        }
+    }
+
+    // printf("node_index: %zu\n", node_index);
+
+    size_t left_child = bst_left_child(node_index);
+    size_t right_child = bst_right_child(node_index);
+
+    Node *temp = list->array[node_index];
+    if ((left_child < list->capacity && right_child < list->capacity) && (list->array[left_child] != NULL && list->array[right_child] != NULL))
+    {
+        // two children nodes
+        size_t successor_index = bst_successor(list, right_child);
+        size_t successor_index_right_child = bst_right_child(successor_index);
+
+        list->array[node_index] = list->array[successor_index];
+        list->array[node_index]->index = node_index; // update the index of the successor node to the index of the node that it is replacing
+        list->array[successor_index] = list->array[successor_index_right_child];
+        list->array[successor_index_right_child] = NULL;
+    }
+    else if (left_child < list->capacity && list->array[left_child] != NULL)
+    {
+        // one child node
+        list->array[node_index] = list->array[left_child];
+        list->array[node_index]->index = node_index;
+        list->array[left_child] = NULL;
+    }
+    else if (right_child < list->capacity && list->array[right_child] != NULL)
+    {
+        // one child node
+        // puts("right child");
+        list->array[node_index] = list->array[right_child];
+        list->array[node_index]->index = node_index;
+        list->array[right_child] = NULL;
+    }
+    else
+    {
+        // no children nodes
+        list->array[node_index] = NULL;
+    }
+    free(temp);
+}
+
+size_t bst_successor(ArrayList *list, size_t index)
+{
+
+    while ((index < list->capacity))
+    {
+
+        index = bst_left_child(index);
+        if (index >= list->capacity || list->array[index] == NULL)
+        {
+            index = bst_parent_index(index);
+            break;
+        }
+    }
+
+    return index;
 }
 
 ArrayList *bst_merge(ArrayList *list1, ArrayList *list2)
 {
-    ArrayList *merged_list = al_create();
+    ArrayList *merged_list = bst_create();
     int i = 0;
     int j = 0;
     while (i < list1->capacity && j < list2->capacity)
@@ -134,20 +266,20 @@ void bst_destroy(ArrayList **listPtr)
     *listPtr = NULL;
 }
 
-void bst_delete(ArrayList *list, int key)
-{
-    // delete node from binary tree
-    for (size_t i = 0; i < list->capacity; i++)
-    {
-        if (list->array[i] == NULL)
-            continue;
-        else if (list->array[i]->key == key)
-        {
-            free(list->array[i]);
-            list->array[i] = NULL;
-        }
-    }
-}
+// void bst_delete(ArrayList *list, int key)
+// {
+//     // delete node from binary tree
+//     for (size_t i = 0; i < list->capacity; i++)
+//     {
+//         if (list->array[i] == NULL)
+//             continue;
+//         else if (list->array[i]->key == key)
+//         {
+//             free(list->array[i]);
+//             list->array[i] = NULL;
+//         }
+//     }
+// }
 
 void bst_print_tree_helper(ArrayList *array_list, Node *node)
 {
@@ -184,10 +316,12 @@ void bst_print_tree(ArrayList *array_list)
 
 void bst_in_order_helper(ArrayList *array_list, Node *node)
 {
+
     if (node == NULL)
     {
         return;
     }
+
     size_t left_index = bst_left_child(node->index);
     size_t right_index = bst_right_child(node->index);
 
@@ -243,7 +377,7 @@ void bst_insert(ArrayList *list, int key)
     list->array[index_insert] = nu;
 }
 
-ArrayList *al_create()
+ArrayList *bst_create()
 {
     ArrayList *nu = malloc(sizeof(ArrayList)); // allocate memory for the struct itself
     nu->capacity = INITIAL_CAPACITY;

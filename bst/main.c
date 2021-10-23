@@ -57,59 +57,69 @@ void print_in_level_order(NodePtr bst);
 
 int main(void)
 {
-    NodePtr bst = NULL; // we do not need to keep track of how many elements there are, only need a pointer to the first node
+    // NodePtr bst = NULL; // we do not need to keep track of how many elements there are, only need a pointer to the first node
 
-    NodePtr bst1 = NULL;
-    NodePtr bst2 = NULL;
+    // NodePtr bst1 = NULL;
+    // NodePtr bst2 = NULL;
 
-    puts("bst:");
-    insert_bst(&bst, 3);
-    insert_bst(&bst, 6);
-    insert_bst(&bst, 2);
-    insert_bst(&bst, 1);
-    insert_bst(&bst, 42);
-    insert_bst(&bst, 100);
-    print_bst(bst);
-    print_in_level_order(bst);
+    // puts("bst:");
+    // insert_bst(&bst, 3);
+    // insert_bst(&bst, 6);
+    // insert_bst(&bst, 2);
+    // insert_bst(&bst, 1);
+    // insert_bst(&bst, 42);
+    // insert_bst(&bst, 100);
+    // print_bst(bst);
+    // print_in_level_order(bst);
 
-    puts("");
-    puts("bst1:");
-    insert_bst(&bst1, 1);
-    insert_bst(&bst1, 2);
-    insert_bst(&bst1, 3);
-    insert_bst(&bst1, 4);
-    insert_bst(&bst1, 5);
-    insert_bst(&bst1, 6);
-    print_bst(bst1);
-    print_in_level_order(bst1);
+    // puts("");
+    // puts("bst1:");
+    // insert_bst(&bst1, 1);
+    // insert_bst(&bst1, 2);
+    // insert_bst(&bst1, 3);
+    // insert_bst(&bst1, 4);
+    // insert_bst(&bst1, 5);
+    // insert_bst(&bst1, 6);
+    // print_bst(bst1);
+    // print_in_level_order(bst1);
 
-    puts("");
-    puts("bst2:");
-    insert_bst(&bst2, 7);
-    insert_bst(&bst2, 2);
-    insert_bst(&bst2, 1);
-    insert_bst(&bst2, 4);
-    insert_bst(&bst2, 3);
-    insert_bst(&bst2, 6);
-    insert_bst(&bst2, 11);
-    insert_bst(&bst2, 8);
-    insert_bst(&bst2, 13);
-    print_bst(bst2);
-    print_in_level_order(bst2);
+    // puts("");
+    // puts("bst2:");
+    // insert_bst(&bst2, 7);
+    // insert_bst(&bst2, 2);
+    // insert_bst(&bst2, 1);
+    // insert_bst(&bst2, 4);
+    // insert_bst(&bst2, 3);
+    // insert_bst(&bst2, 6);
+    // insert_bst(&bst2, 11);
+    // insert_bst(&bst2, 8);
+    // insert_bst(&bst2, 13);
+    // print_bst(bst2);
+    // print_in_level_order(bst2);
 
-    NodePtr merged = merge_bst(bst, bst1);
+    // NodePtr merged = merge_bst(bst, bst1);
 
-    puts("-------------------");
-    puts("merged: ");
-    print_bst(merged);
-    print_in_level_order(merged);
+    // puts("-------------------");
+    // puts("merged: ");
+    // print_bst(merged);
+    // print_in_level_order(merged);
 
-    puts("");
+    // puts("");
 
-    destroy_bst(&bst);
-    destroy_bst(&bst1);
-    destroy_bst(&bst2);
-    destroy_bst(&merged);
+    // destroy_bst(&bst);
+    // destroy_bst(&bst1);
+    // destroy_bst(&bst2);
+    // destroy_bst(&merged);
+    NodePtr nu = NULL;
+    insert_bst(&nu, 4);
+    insert_bst(&nu, 3);
+    insert_bst(&nu, 5);
+    insert_bst(&nu, 2);
+    insert_bst(&nu, 6);
+    delete_bst(&nu, 4);
+    print_bst(nu);
+    NodePtr *successor = successor_bst(&(nu->right));
+    printf("successor: %d\n", (*successor)->key); // 2
 }
 
 void insert_bst(NodePtr *bstPtr, int key)
@@ -257,6 +267,7 @@ void delete_bst(NodePtr *bstPtr, int key)
 
 NodePtr *successor_bst(NodePtr *treePtr)
 {
+    //
     NodePtr tree = *treePtr;
     if (tree->left == NULL)
     {

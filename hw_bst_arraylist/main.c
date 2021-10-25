@@ -5,7 +5,6 @@
 typedef struct node
 {
     int key;
-    size_t index; // index number in the arraylist
 } Node;
 
 typedef struct arraylist
@@ -57,6 +56,9 @@ int main(void)
     bst_insert(nu3, 6);
     bst_insert(nu3, 10);
     bst_insert(nu3, 11);
+    bst_insert(nu3, 6);
+    bst_insert(nu3, 10);
+    bst_insert(nu3, 11);
 
     puts("original trees");
     puts("*************************");
@@ -79,12 +81,15 @@ int main(void)
     puts("");
     puts("deleting nodes from trees...");
     puts("");
-    bst_delete(nu3, 4);
-    bst_delete(nu2, 10);
-    bst_delete(nu, 6);
+    bst_delete(nu3, 3);
+
+    bst_delete(nu2, 9);
+    puts("here");
+    bst_delete(nu, 5);
 
     puts("modified trees");
     puts("*************************");
+
     puts("--------------------");
     puts("nu");
     puts("--------------------");
@@ -100,8 +105,6 @@ int main(void)
     puts("--------------------");
     bst_print_tree(nu3);
     puts("*************************");
-
-    puts("");
 
     puts("merging trees...");
     puts("*************************");
@@ -128,63 +131,89 @@ int main(void)
 
 void bst_delete(ArrayList *list, int key)
 {
-    // if no children nodes, just delete current node
-    // if one children node, join the child node to the parent node
-    // if two children nodes, find the successor node and replace the current node with the successor node
-
-    // find the node to be deleted
-    size_t node_index = 0;
-
-    for (size_t i = 0; i < list->capacity; i++)
+    size_t i = 0;
+    for (; list->array[i] != NULL;)
     {
-        if (list->array[i] == NULL)
-            continue;
-        else if (list->array[i]->key == key)
+        if (list->array[i]->key == key)
         {
-            // printf("list key: %d, key: %d\n", list->array[i]->key, key);
-            node_index = i;
-            break;
+            size_t successor_index;
+            if (bst_right_child(i) < list->capacity && list->array[bst_right_child(i)] != NULL)
+            {
+                successor_index = bst_successor(list, bst_right_child(i));
+            }
+            else
+            {
+                // puts("right");
+                successor_index = bst_successor(list, i);
+            }
+
+            // printf("successor_index: %zu\n", successor_index);
+            size_t successor_index_right_child = bst_right_child(successor_index);
+            // printf("key: %p\n", list->array[successor_index]);
+            // get successor
+            if (list->array[successor_index] == NULL || successor_index > list->capacity)
+            {
+                // no children
+                // puts("no children");
+                free(list->array[i]);
+                list->array[i] = NULL;
+            }
+            else if (list->array[successor_index_right_child] != NULL)
+            {
+                // successor has right child
+                // puts("right child");
+                Node *successor_node = malloc(sizeof(Node));
+                successor_node->key = list->array[successor_index]->key;
+                free(list->array[i]);
+                list->array[i] = successor_node;
+                free(list->array[successor_index]);
+                list->array[successor_index] = NULL;
+                for (size_t i = successor_index; i < list->capacity; i++)
+                {
+                    size_t index_right_child = bst_right_child(i);
+                    if (index_right_child < list->capacity && list->array[index_right_child] != NULL)
+                    {
+                        list->array[i] = list->array[index_right_child];
+                        list->array[index_right_child] = NULL;
+                    }
+                }
+            }
+            else if (successor_index != 0)
+            {
+                // printf("index: %zu\n", i);
+                // printf("succ: %zu\n", successor_index);
+                // printf("capacity: %u\n", list->capacity);
+                // if successor is not NULL
+                Node *successor_node = malloc(sizeof(Node));
+                successor_node->key = list->array[successor_index]->key;
+                free(list->array[i]);
+                list->array[i] = successor_node;
+                free(list->array[successor_index]);
+                list->array[successor_index] = NULL;
+            }
+            return;
+        }
+
+        else if (bst_left_child(i) < list->capacity)
+        {
+            size_t left_index = bst_left_child(i);
+            size_t right_index = bst_right_child(i);
+            if (key < list->array[i]->key)
+            {
+                if (left_index < list->capacity)
+                {
+                    i = left_index;
+                }
+            }
+            else
+            {
+                if (right_index < list->capacity)
+                {
+                    i = right_index;
+                }
+            }
         }
     }
-
-    // printf("node_index: %zu\n", node_index);
-
-    size_t left_child = bst_left_child(node_index);
-    size_t right_child = bst_right_child(node_index);
-
-    Node *temp = list->array[node_index];
-    if ((left_child < list->capacity && right_child < list->capacity) && (list->array[left_child] != NULL && list->array[right_child] != NULL))
-    {
-        // two children nodes
-        size_t successor_index = bst_successor(list, right_child);
-        size_t successor_index_right_child = bst_right_child(successor_index);
-
-        list->array[node_index] = list->array[successor_index];
-        list->array[node_index]->index = node_index; // update the index of the successor node to the index of the node that it is replacing
-        list->array[successor_index] = list->array[successor_index_right_child];
-        list->array[successor_index_right_child] = NULL;
-    }
-    else if (left_child < list->capacity && list->array[left_child] != NULL)
-    {
-        // one child node
-        list->array[node_index] = list->array[left_child];
-        list->array[node_index]->index = node_index;
-        list->array[left_child] = NULL;
-    }
-    else if (right_child < list->capacity && list->array[right_child] != NULL)
-    {
-        // one child node
-        // puts("right child");
-        list->array[node_index] = list->array[right_child];
-        list->array[node_index]->index = node_index;
-        list->array[right_child] = NULL;
-    }
-    else
-    {
-        // no children nodes
-        list->array[node_index] = NULL;
-    }
-    free(temp);
 }
 
 size_t bst_successor(ArrayList *list, size_t index)
@@ -194,6 +223,8 @@ size_t bst_successor(ArrayList *list, size_t index)
     {
 
         index = bst_left_child(index);
+        // printf("index: %zu\n", index);
+
         if (index >= list->capacity || list->array[index] == NULL)
         {
             index = bst_parent_index(index);
@@ -266,31 +297,16 @@ void bst_destroy(ArrayList **listPtr)
     *listPtr = NULL;
 }
 
-// void bst_delete(ArrayList *list, int key)
-// {
-//     // delete node from binary tree
-//     for (size_t i = 0; i < list->capacity; i++)
-//     {
-//         if (list->array[i] == NULL)
-//             continue;
-//         else if (list->array[i]->key == key)
-//         {
-//             free(list->array[i]);
-//             list->array[i] = NULL;
-//         }
-//     }
-// }
-
-void bst_print_tree_helper(ArrayList *array_list, Node *node)
+void bst_print_tree_helper(ArrayList *array_list, size_t index)
 {
     static unsigned int depth = 0;
-    if (node == NULL)
+    if (array_list->array[index] == NULL)
         return;
     ++depth;
-    size_t right_index = bst_right_child(node->index);
+    size_t right_index = bst_right_child(index);
     if (right_index < array_list->capacity)
     {
-        bst_print_tree_helper(array_list, array_list->array[right_index]);
+        bst_print_tree_helper(array_list, right_index);
     }
     --depth;
     for (unsigned int i = 0; i < depth; ++i)
@@ -298,12 +314,12 @@ void bst_print_tree_helper(ArrayList *array_list, Node *node)
         printf("  ");
     }
 
-    printf("%d\n", node->key);
+    printf("%d\n", array_list->array[index]->key);
     ++depth;
-    size_t left_index = bst_left_child(node->index);
+    size_t left_index = bst_left_child(index);
     if (left_index < array_list->capacity)
     {
-        bst_print_tree_helper(array_list, array_list->array[left_index]);
+        bst_print_tree_helper(array_list, left_index);
     }
     --depth;
 }
@@ -311,32 +327,32 @@ void bst_print_tree_helper(ArrayList *array_list, Node *node)
 void bst_print_tree(ArrayList *array_list)
 {
     // print binary tree
-    bst_print_tree_helper(array_list, array_list->array[0]);
+    bst_print_tree_helper(array_list, 0);
 }
 
-void bst_in_order_helper(ArrayList *array_list, Node *node)
+void bst_in_order_helper(ArrayList *array_list, size_t index)
 {
 
-    if (node == NULL)
+    if (array_list->array[index] == NULL)
     {
         return;
     }
 
-    size_t left_index = bst_left_child(node->index);
-    size_t right_index = bst_right_child(node->index);
+    size_t left_index = bst_left_child(index);
+    size_t right_index = bst_right_child(index);
 
     if (left_index < array_list->capacity)
-        bst_in_order_helper(array_list, array_list->array[left_index]);
+        bst_in_order_helper(array_list, left_index);
 
-    printf("%d ", node->key);
+    printf("%d ", array_list->array[index]->key);
 
     if (right_index < array_list->capacity)
-        bst_in_order_helper(array_list, array_list->array[right_index]);
+        bst_in_order_helper(array_list, right_index);
 }
 
 void bst_print_in_order(ArrayList *array_list)
 {
-    bst_in_order_helper(array_list, array_list->array[0]);
+    bst_in_order_helper(array_list, 0);
     puts("");
 }
 
@@ -373,7 +389,6 @@ void bst_insert(ArrayList *list, int key)
     // insert here
     Node *nu = malloc(sizeof(Node));
     nu->key = key;
-    nu->index = index_insert;
     list->array[index_insert] = nu;
 }
 
@@ -402,9 +417,9 @@ void bst_print_level_order(ArrayList *array_list)
     for (size_t i = 0; i < array_list->capacity; ++i)
     {
         if (array_list->array[i] == NULL)
-            printf("N ");
+            printf("N  ");
         else
-            printf("%d ", (array_list->array[i])->key);
+            printf("%d  ", (array_list->array[i])->key);
     }
     printf("\n");
 }
@@ -419,7 +434,6 @@ void bst_resize(ArrayList *list, unsigned int old_capacity)
 }
 /*
     Implementation: Store nodes of the binary stree in level order in the arraylist
-
     capacity: 2^depth - 1
     left(index): 2(index) + 1
     right(index): 2(index) + 2
@@ -428,8 +442,6 @@ void bst_resize(ArrayList *list, unsigned int old_capacity)
             parent_index = (index-1) / 2
         else if (index % 2 == 0)
             parent_index = (index-2) / 2
-
     we resize bst when we need to add another depth
-
     new_capacity(old_capacity): 2*old_capacity + 1
 */

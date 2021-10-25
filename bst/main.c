@@ -110,16 +110,24 @@ int main(void)
     // destroy_bst(&bst1);
     // destroy_bst(&bst2);
     // destroy_bst(&merged);
-    NodePtr nu = NULL;
-    insert_bst(&nu, 4);
-    insert_bst(&nu, 3);
-    insert_bst(&nu, 5);
-    insert_bst(&nu, 2);
-    insert_bst(&nu, 6);
-    delete_bst(&nu, 4);
-    print_bst(nu);
-    NodePtr *successor = successor_bst(&(nu->right));
-    printf("successor: %d\n", (*successor)->key); // 2
+    NodePtr nu3 = NULL;
+    insert_bst(&nu3, 4);
+    insert_bst(&nu3, 3);
+    insert_bst(&nu3, 2);
+    insert_bst(&nu3, 5);
+    insert_bst(&nu3, 6);
+    insert_bst(&nu3, 9);
+    insert_bst(&nu3, 8);
+    insert_bst(&nu3, 10);
+    insert_bst(&nu3, 6);
+    insert_bst(&nu3, 10);
+    insert_bst(&nu3, 11);
+    print_bst(nu3);
+    puts("-----------------");
+    delete_bst(&nu3, 6);
+    print_bst(nu3);
+    // NodePtr *successor = successor_bst(&(nu->right));
+    // printf("successor: %d\n", (*successor)->key); // 2
 }
 
 void insert_bst(NodePtr *bstPtr, int key)

@@ -39,6 +39,7 @@ void heap_delete(HeapPtr heap, int key);                    // delete node at in
 
 void heap_queue_push(QueuePtr queue, size_t index); // push index into queue
 size_t heap_queue_pop(QueuePtr queue);              // pop index from queue; return -1 if queue is empty
+size_t heap_find(HeapPtr heap, int key);            // find index of key in heap; return -1 if key not found
 
 int main(void)
 {
@@ -146,6 +147,43 @@ void heap_sift(HeapPtr heap, size_t index)
     }
 }
 
+void heap_insert(HeapPtr heap, int key)
+{
+    heap_resize_if_full(heap);
+    heap->array[heap->size] = key; // size-1 is the element of the prev last one
+    heap_bubble(heap, heap->size);
+    heap->size++;
+}
+
+void heap_delete_better(HeapPtr heap, int key)
+{
+
+    // find the key
+    // swap the last element with the key
+    // bubble down the key
+    // decrement size
+
+    for (size_t i = 0; i < heap->size; i++)
+    {
+        if (heap->array[i] == key)
+        {
+            {
+                heap_swap(heap, i, heap->size - 1);
+                heap_sift(heap, i + 1);
+            }
+        }
+    }
+    heap->size--;
+}
+
+void heap_delete(HeapPtr heap, int key)
+{
+
+    // look at current node. if not key were are looking for:
+    // append its two children to it
+    // keep popping things off the head and push to the tail of the queue
+}
+
 // helpers
 size_t heap_left(size_t index)
 {
@@ -178,39 +216,66 @@ void heap_resize_if_full(HeapPtr heap)
     }
 }
 
-void heap_insert(HeapPtr heap, int key)
+void heap_queue_push(QueuePtr queue, size_t index)
 {
-    heap_resize_if_full(heap);
-    heap->array[heap->size] = key; // size-1 is the element of the prev last one
-    heap_bubble(heap, heap->size);
-    heap->size++;
-}
-void heap_delete_better(HeapPtr heap, int key)
-{
+    QNodePtr new_node = malloc(sizeof(QNode));
+    new_node->index = index;
+    new_node->next = NULL;
 
-    // find the key
-    // swap the last element with the key
-    // bubble down the key
-    // decrement size
-
-    for (size_t i = 0; i < heap->size; i++)
+    if (queue->head == NULL)
+        queue->head = new_node;
+    else
     {
-        if (heap->array[i] == key)
+        QNodePtr current = queue->head;
+        while (current->next != NULL)
+            current = current->next;
+        current->next = new_node;
+    }
+}
+
+size_t heap_find(HeapPtr heap, int key)
+{
+    static Queue queue = {NULL, NULL}; // we don't need to use the queue outside this function.
+
+    if (queue.head == NULL)
+    {
+        if (heap->array[0] == key)
+            return 0;
+        else if (heap->array[0] < key)
+            return heap->size; // not in the array since the key is greater than the root node
+        else
         {
+            heap_queue_push(&queue, 0);
+            return heap_find(heap, key);
+        }
+    }
+    else
+    {
+        size_t index = heap_queue_pop(&queue);
+        size_t left = heap_left(index), right = heap_right(index);
+        if (left < heap->size)
+        {
+            // child must exist
+            if (heap->array[left] == key)
             {
-                heap_swap(heap, i, heap->size - 1);
-                heap_sift(heap, i + 1);
+                heap_queue_clear(&queue);
+                return left;
+            }
+            // else if (heap->array[left] < key)
+            // {
+            //     heap_queue_push(&queue, left);
+            //     return heap_find(heap, key);
+            // }
+            else if (heap->array[left] > key)
+            {
+                heap_queue_push(&queue, left);
+                // TODO
+            }
+
+            if (right < heap->size)
+            {
+                // child must exist
             }
         }
     }
-    heap->size--;
-}
-
-void heap_delete(HeapPtr heap, int key)
-{
-    QueuePtr queue = malloc(sizeof(Queue));
-    queue->head = NULL;
-    queue->tail = NULL;
-
-    //
 }

@@ -51,7 +51,7 @@ int main(void)
     heap_insert(heap, 9);
     heap_insert(heap, 23);
     heap_insert(heap, 314);
-    heap_insert(heap, 100);
+    heap_insert(heap, 1000);
 
     // test cases
     puts("Original Heap");
@@ -59,7 +59,7 @@ int main(void)
 
     puts("");
 
-    int key = 42;
+    int key = 1000;
     printf("trying to find %d in heap...\n", key);
     size_t index = heap_find(heap, key);
     printf("found index at: %zu\n", index);
@@ -204,7 +204,7 @@ void heap_delete(HeapPtr heap, int key)
         heap_swap(heap, index, heap->size - 1);
         heap->size--;
 
-        if (heap->array[index] > heap->array[heap_parent(index)])
+        if (index > 0 && (heap->array[index] > heap->array[heap_parent(index)]))
             heap_bubble(heap, index);
         else
             heap_sift(heap, index);

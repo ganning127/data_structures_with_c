@@ -38,9 +38,10 @@ void heap_swap(HeapPtr heap, size_t index1, size_t index2); // swap two nodes
 void heap_delete(HeapPtr heap, int key);                    // delete node at index
 
 void heap_queue_push(QueuePtr queue, size_t index); // push index into queue
-size_t heap_queue_pop(QueuePtr queue);              // pop index from queue; return -1 if queue is empty
-size_t heap_find(HeapPtr heap, int key);            // find index of key in heap; return -1 if key not found
+size_t heap_queue_pop(QueuePtr queue);              // pop head from queue
+size_t heap_find(HeapPtr heap, int key);            // find index of key in heap; return heap->sive if key not found
 void heap_queue_clear(QueuePtr queue);              // clear queue
+void heap_print_in_order(HeapPtr heap);             // print heap in order
 
 int main(void)
 {
@@ -50,10 +51,7 @@ int main(void)
     heap_insert(heap, 9);
     heap_insert(heap, 23);
     heap_insert(heap, 314);
-    heap_insert(heap, 0);
-    heap_insert(heap, 1);
-    heap_insert(heap, -1);
-    heap_insert(heap, -2);
+    heap_insert(heap, 100);
 
     // test cases
     puts("Original Heap");
@@ -61,16 +59,16 @@ int main(void)
 
     puts("");
 
-    int key = 0;
-    printf("trying to find %d in heap...", key);
+    int key = 42;
+    printf("trying to find %d in heap...\n", key);
     size_t index = heap_find(heap, key);
     printf("found index at: %zu\n", index);
 
-    // int key_not_found = 100;
-    // printf("trying to find %d in heap...", key_not_found);
-    // size_t index_not_found = heap_find(heap, key_not_found);
-    // printf("index_not_found = %zu\n", index_not_found);
+    puts("");
+    heap_delete(heap, key);
 
+    puts("heap after deleting...");
+    heap_print(heap);
     heap_destroy(&heap);
     free(heap);
     return 0;
@@ -198,6 +196,19 @@ void heap_delete(HeapPtr heap, int key)
     // look at current node. if not key were are looking for:
     // append its two children to it
     // keep popping things off the head and push to the tail of the queue
+    // if we find the key, we can just pop it off the queue
+
+    size_t index = heap_find(heap, key);
+    if (index < heap->size)
+    {
+        heap_swap(heap, index, heap->size - 1);
+        heap->size--;
+
+        if (heap->array[index] > heap->array[heap_parent(index)])
+            heap_bubble(heap, index);
+        else
+            heap_sift(heap, index);
+    }
 }
 
 // helpers
@@ -273,6 +284,7 @@ size_t heap_find(HeapPtr heap, int key)
         size_t index = heap_queue_pop(&queue);
         size_t left = heap_left(index);
         size_t right = left + 1;
+
         if (left < heap->size)
         {
             // child must exist
@@ -281,10 +293,8 @@ size_t heap_find(HeapPtr heap, int key)
                 heap_queue_clear(&queue);
                 return left;
             }
-            else if (heap->array[left] > key)
-            {
+            else if (heap->array[left])
                 heap_queue_push(&queue, left);
-            }
 
             if (right < heap->size)
             {
@@ -294,18 +304,19 @@ size_t heap_find(HeapPtr heap, int key)
                     return right;
                 }
                 else if (heap->array[right] > key)
-                {
                     heap_queue_push(&queue, right);
-                }
-                return heap_find(heap, key);
             }
             else
             {
+                heap_queue_clear(&queue);
                 return heap->size;
             }
+
+            return heap_find(heap, key);
         }
         else
         {
+            heap_queue_clear(&queue); // stop checking when we find a node with no children
             return heap->size;
         }
     }
@@ -330,4 +341,14 @@ size_t heap_queue_pop(QueuePtr queue)
     queue->head = queue->head->next;
     free(temp);
     return index;
+}
+
+void heap_print_in_order(HeapPtr heap)
+{
+    printf("[");
+    for (size_t i = 0; i < heap->size; i++)
+    {
+        printf("%d ", heap->array[i]);
+    }
+    printf("]\n");
 }

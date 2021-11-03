@@ -17,10 +17,11 @@ char **p1(size_t size)
     return calloc(size, sizeof(char *));
 }
 
-char **p2(char **strings, size_t size)
+void p2(char **arr[], size_t size)
 {
-    // DONE
-    return realloc(strings, size * 2 * sizeof(char *));
+    // double the size allocated to array
+    // allocate new array
+    *arr = realloc(*arr, sizeof(char *) * size * 2);
 }
 
 char **p3(char **strings, size_t size)

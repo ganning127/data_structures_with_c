@@ -42,6 +42,8 @@ size_t heap_queue_pop(QueuePtr queue);              // pop head from queue
 size_t heap_find(HeapPtr heap, int key);            // find index of key in heap; return heap->sive if key not found
 void heap_queue_clear(QueuePtr queue);              // clear queue
 void heap_print_in_order(HeapPtr heap);             // print heap in order
+void heapify(int arr[], size_t size);               // heapify array
+void heap_sort(int arr[], size_t size);             // sort array
 
 int main(void)
 {
@@ -71,6 +73,9 @@ int main(void)
     heap_print(heap);
     heap_destroy(&heap);
     free(heap);
+
+    int arr[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    heapify(arr, sizeof(arr) / sizeof(int));
     return 0;
 }
 
@@ -146,7 +151,7 @@ void heap_sift(HeapPtr heap, size_t index)
     // used when we delete an element
     // sift down from the root node
     // swap the greatest child with where the node is
-
+    puts("called");
     size_t left = heap_left(index);
     if (left >= heap->size)
         return;
@@ -209,6 +214,64 @@ void heap_delete(HeapPtr heap, int key)
         else
             heap_sift(heap, index);
     }
+}
+
+void heap_array_sift(int arr[], size_t size, size_t index)
+{
+    // used when we delete an element
+    // sift down from the root node
+    // swap the greatest child with where the node is
+
+    size_t left = heap_left(index);
+    if (left >= size)
+        return;
+    size_t right = left + 1;
+    size_t max_child = (right < size && arr[right] > arr[left]) ? right : left;
+
+    if (arr[index] < arr[max_child])
+    {
+        // check if the parent is greater than the child
+        int temp = arr[index];
+        arr[index] = arr[max_child];
+        arr[max_child] = temp;
+        heap_array_sift(arr, size, max_child);
+    }
+}
+
+void heapify(int arr[], size_t size)
+{
+    // in place heapify array
+    // start at the last parent
+    // bubble down
+
+    if (size <= 2)
+        return;
+    for (size_t index = heap_parent(size - 1); index >= 0; --index)
+    {
+        heap_array_sift(arr, index, size);
+    }
+    heap_array_sift(arr, 0, size);
+
+    puts("here");
+    for (size_t i = 0; i < size; ++i)
+    {
+        printf("%d ", arr[i]);
+    }
+
+    puts("");
+}
+
+void heap_sort(int arr[], size_t size)
+{
+    heapify(arr, size);
+    for (size_t i = size - 1; i > 0; --i)
+    {
+        int temp = arr[0];
+        arr[0] = arr[i];
+        arr[i] = temp;
+        heap_array_sift(arr, 0, i);
+    }
+    // now the array is sorted
 }
 
 // helpers
@@ -352,3 +415,12 @@ void heap_print_in_order(HeapPtr heap)
     }
     printf("]\n");
 }
+
+/*
+Going from array to heap:
+    - build the heap from the bottom up
+    - start at the last parent node
+    - compare the parent node to its children
+    - if the parent node is less than its children, swap them
+    - repeat until the heap is built
+*/

@@ -76,7 +76,10 @@ int main(void)
     free(heap);
 
     int arr[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    heapify(arr, sizeof(arr) / sizeof(int));
+    size_t length = sizeof(arr) / sizeof(arr[0]);
+    heap_sort(arr, length);
+
+    showArray(arr, length);
     return 0;
 }
 
@@ -216,7 +219,7 @@ void heap_delete(HeapPtr heap, int key)
     }
 }
 
-void heap_array_sift(int arr[], size_t size, size_t index)
+void heap_array_sift(int arr[], size_t index, size_t size)
 {
     // used when we delete an element
     // sift down from the root node
@@ -234,7 +237,7 @@ void heap_array_sift(int arr[], size_t size, size_t index)
         int temp = arr[index];
         arr[index] = arr[max_child];
         arr[max_child] = temp;
-        heap_array_sift(arr, size, max_child);
+        heap_array_sift(arr, max_child, size);
     }
 }
 
@@ -248,27 +251,30 @@ void heapify(int arr[], size_t size)
         return;
 
     printf("size: %zu\n", size);
-    size_t starting_index = heap_parent(size - 1);
+    size_t starting_index = heap_parent(size - 1); // start from the parent of the last node. everything after this is already a heap because they have no children, so they must obey the max heap property.
 
     for (size_t index = starting_index; index > 0; --index)
-    {
-        heap_array_sift(arr, size, index);
-    }
+        heap_array_sift(arr, index, size);
 
-    heap_array_sift(arr, size, 0);
+    heap_array_sift(arr, 0, size);
+    showArray(arr, size);
 }
 
 void heap_sort(int arr[], size_t size)
 {
     heapify(arr, size);
-    for (size_t i = size - 1; i > 0; --i)
+
+    for (size_t i = size - 1; i > 1; --i)
     {
         int temp = arr[0];
         arr[0] = arr[i];
         arr[i] = temp;
         heap_array_sift(arr, 0, i);
     }
-    // now the array is sorted
+    // swap zero and index one
+    int temp = arr[0];
+    arr[0] = arr[1];
+    arr[1] = temp;
 }
 
 // helpers
@@ -412,15 +418,6 @@ void heap_print_in_order(HeapPtr heap)
     }
     printf("]\n");
 }
-
-/*
-Going from array to heap:
-    - build the heap from the bottom up
-    - start at the last parent node
-    - compare the parent node to its children
-    - if the parent node is less than its children, swap them
-    - repeat until the heap is built
-*/
 
 void showArray(int arr[], size_t size)
 {

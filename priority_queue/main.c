@@ -70,7 +70,7 @@ int main(void)
 
     // test cases
     puts("Original Heap (tree form)");
-    heap_print(heap);
+    heap_print(heap); // binary tree form
     puts("");
     puts("Original Heap (array form)");
     heap_print_in_order(heap);
@@ -88,7 +88,7 @@ int main(void)
     int arr[length];
     for (size_t i = 0; i < length; i++)
     {
-        arr[i] = rand() % 100;
+        arr[i] = rand() % 100; // random numbers from 1-100
     }
     puts("Original Array");
     showArray(arr, length);

@@ -396,7 +396,7 @@ int *bst_merge_lists(int *listA, int *listB, size_t sizeA, size_t sizeB)
     // one of the lists are done
     for (; i < sizeA; ++i)
         merged[i + j] = listA[i];
-    for (; j < sizeA; ++i)
+    for (; j < sizeA; ++j)
         merged[i + j] = listB[j];
 
     return merged;

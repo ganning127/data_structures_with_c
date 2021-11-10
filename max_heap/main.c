@@ -23,81 +23,43 @@ typedef struct queue
 } Queue;
 typedef Queue *QueuePtr;
 
-// functions needed for priority queue pop and push
 HeapPtr heap_create(void);                                  // create a new heap
-void heap_push(HeapPtr heap, int key);                      // insert key into heap
-int heap_pop(HeapPtr heap);                                 // delete and return root
-void heap_sort(int arr[], size_t size);                     // sort array
-void heapify(int arr[], size_t size);                       // heapify array
 size_t heap_parent(size_t index);                           // get parent index
 size_t heap_left(size_t index);                             // get left child index
 size_t heap_right(size_t index);                            // get right child index
+void heap_print(HeapPtr heap);                              // print heap
 void heap_destroy(HeapPtr *heapPtr);                        // destroy heap
+void heap_insert(HeapPtr heap, int key);                    // insert key into heap
 void heap_bubble(HeapPtr heap, size_t index);               // bubble up
 void heap_sift(HeapPtr heap, size_t index);                 // sift down
 void heap_resize_if_full(HeapPtr heap);                     // resize if heap is full
+void heap_delete_better(HeapPtr heap, int key);             // extra function that I have that deletes a node
 void heap_swap(HeapPtr heap, size_t index1, size_t index2); // swap two nodes
-void heap_print(HeapPtr heap);                              // print heap
-void heap_print_in_order(HeapPtr heap);                     // print heap in order
+void heap_delete(HeapPtr heap, int key);                    // delete node at index
 
-// extra functions
-void heap_delete(HeapPtr heap, int key);            // delete node at index
 void heap_queue_push(QueuePtr queue, size_t index); // push index into queue
-void heap_queue_clear(QueuePtr queue);              // clear queue
 size_t heap_queue_pop(QueuePtr queue);              // pop head from queue
 size_t heap_find(HeapPtr heap, int key);            // find index of key in heap; return heap->sive if key not found
-
+void heap_queue_clear(QueuePtr queue);              // clear queue
+void heap_print_in_order(HeapPtr heap);             // print heap in order
+void heapify(int arr[], size_t size);               // heapify array
+void heap_sort(int arr[], size_t size);             // sort array
 void showArray(int arr[], size_t size);
 
 int main(void)
 {
-    /*
-        Priority Queue and Heap sort
-            - heap_push() is the function that inserts a new node into the heap
-            - heap_pop() is the function that deletes the root node and returns its value
-            - heap_sort() is the function that sorts the array using heap sort
-
-    */
-
-    // Push and pop to and from the priority queue. While doing so, print out the heap in both array and binary tree format.
     HeapPtr heap = heap_create();
-    heap_push(heap, 42);
-    heap_push(heap, 11);
-    heap_push(heap, 9);
-    heap_push(heap, 23);
-    heap_push(heap, 314);
-    heap_push(heap, 1000);
+    heap_insert(heap, 42);
+    heap_insert(heap, 11);
+    heap_insert(heap, 9);
+    heap_insert(heap, 23);
+    heap_insert(heap, 314);
+    heap_insert(heap, 1000);
 
     // test cases
-    puts("Original Heap (tree form)");
-    heap_print(heap);
-    puts("");
-    puts("Original Heap (array form)");
-    heap_print_in_order(heap);
-
-    // test cases
-    puts("");
-    int popped = heap_pop(heap);
-
-    printf("popped: %d\n", popped);
-    puts("");
+    puts("Original Heap");
     heap_print(heap);
 
-    puts("--------------------------------");
-    size_t length = 10;
-    int arr[length];
-    for (size_t i = 0; i < length; i++)
-    {
-        arr[i] = rand() % 100;
-    }
-    puts("Original Array");
-    showArray(arr, length);
-
-    heap_sort(arr, length);
-
-    puts("");
-    puts("Sorted Array");
-    showArray(arr, length);
     return 0;
 }
 
@@ -187,7 +149,7 @@ void heap_sift(HeapPtr heap, size_t index)
     }
 }
 
-void heap_push(HeapPtr heap, int key)
+void heap_insert(HeapPtr heap, int key)
 {
     heap_resize_if_full(heap);
     heap->array[heap->size] = key; // size-1 is the element of the prev last one
@@ -195,17 +157,25 @@ void heap_push(HeapPtr heap, int key)
     heap->size++;
 }
 
-int heap_pop(HeapPtr heap)
+void heap_delete_better(HeapPtr heap, int key)
 {
-    int key = heap->array[0];
-    if (heap->size > 0)
-    {
-        heap_swap(heap, 0, heap->size - 1);
-        heap->size--;
 
-        heap_sift(heap, 0);
+    // find the key
+    // swap the last element with the key
+    // bubble down the key
+    // decrement size
+
+    for (size_t i = 0; i < heap->size; i++)
+    {
+        if (heap->array[i] == key)
+        {
+            {
+                heap_swap(heap, i, heap->size - 1);
+                heap_sift(heap, i + 1);
+            }
+        }
     }
-    return key;
+    heap->size--;
 }
 
 void heap_delete(HeapPtr heap, int key)
@@ -260,12 +230,14 @@ void heapify(int arr[], size_t size)
     if (size <= 2)
         return;
 
+    printf("size: %zu\n", size);
     size_t starting_index = heap_parent(size - 1); // start from the parent of the last node. everything after this is already a heap because they have no children, so they must obey the max heap property.
 
     for (size_t index = starting_index; index > 0; --index)
         heap_array_sift(arr, index, size);
 
     heap_array_sift(arr, 0, size);
+    showArray(arr, size);
 }
 
 void heap_sort(int arr[], size_t size)

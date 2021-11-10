@@ -3,7 +3,7 @@
 
 void swap(int arr[], size_t index1, size_t index2);
 void putMedianInMiddle(int arr[], size_t length);
-void quickSort(int arr[], size_t start, size_t length);
+void quickSort(int arr[], size_t length);
 void showArray(int arr[], size_t length);
 int main(void)
 {
@@ -18,7 +18,7 @@ int main(void)
     srand(42);
     showArray(arr, length);
     puts("");
-    quickSort(arr, 0, length - 1);
+    quickSort(arr, length - 1);
     showArray(arr, length);
 
     return 0;
@@ -33,7 +33,7 @@ void showArray(int arr[], size_t length)
     printf("\n");
 }
 
-size_t partitionArray(int arr[], size_t low, size_t length)
+size_t partitionArray(int arr[], size_t length)
 {
     /*
     // j looks for things less  than or equal to the pivot
@@ -42,8 +42,8 @@ size_t partitionArray(int arr[], size_t low, size_t length)
     */
 
     int pivot = arr[length - 1];
-    size_t i = low - 1;
-    size_t j = length + 1;
+    int i = -1;
+    int j = length + 1;
     while (1)
     {
         do
@@ -64,15 +64,14 @@ size_t partitionArray(int arr[], size_t low, size_t length)
     }
 }
 
-void quickSort(int arr[], size_t low, size_t length)
+void quickSort(int arr[], size_t length)
 {
-    if (low >= 0 && length >= 0 && low < length)
-    {
-        // putMedianInMiddle(arr, length);
-        size_t i = partitionArray(arr, low, length);
-        quickSort(arr, low, i);
-        quickSort(arr, i + 1, length);
-    }
+    if (length <= 1)
+        return;
+    putMedianInMiddle(arr, length);
+    size_t i = partitionArray(arr, length);
+    quickSort(arr, i);
+    quickSort(arr + i + 1, length - i - 1);
 }
 
 void swap(int arr[], size_t index1, size_t index2)
@@ -105,17 +104,3 @@ void putMedianInMiddle(int arr[], size_t length)
         swap(arr, first, last);
     }
 }
-
-/*
-QuickSort()
-    1. Take three random elements, and take the median of those three elements as the pivot.
-    2. Put that median in the center of the array.
-    3. Partition the array into two parts, one with elements less than the pivot, one with elements greater than the pivot
-        - have two pointers: one at the beginning of the array, one at the end of the array.
-        - increment pointer at beg
-        - decrement pointer at end
-        - stop once end pointer is less than beg pointer
-    4. Call QuickSort() on each half
-    Choose another pivot in the middle of the two parts again
-    Algorithm should be in-place
-*/

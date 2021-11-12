@@ -54,80 +54,30 @@ int *bst_merge_lists(int *listA, int *listB, size_t sizeA, size_t sizeB);
 int *bst_to_list_w_size(NodePtr tree, size_t size);
 NodePtr bst_list_to_tree_w_size(int *list, size_t size);
 void print_in_level_order(NodePtr bst);
-
+void pretty_print_bst(NodePtr bst);
 int main(void)
 {
-    // NodePtr bst = NULL; // we do not need to keep track of how many elements there are, only need a pointer to the first node
-
-    // NodePtr bst1 = NULL;
-    // NodePtr bst2 = NULL;
-
-    // puts("bst:");
-    // insert_bst(&bst, 3);
-    // insert_bst(&bst, 6);
-    // insert_bst(&bst, 2);
-    // insert_bst(&bst, 1);
-    // insert_bst(&bst, 42);
-    // insert_bst(&bst, 100);
-    // print_bst(bst);
-    // print_in_level_order(bst);
-
-    // puts("");
-    // puts("bst1:");
-    // insert_bst(&bst1, 1);
-    // insert_bst(&bst1, 2);
-    // insert_bst(&bst1, 3);
-    // insert_bst(&bst1, 4);
-    // insert_bst(&bst1, 5);
-    // insert_bst(&bst1, 6);
-    // print_bst(bst1);
-    // print_in_level_order(bst1);
-
-    // puts("");
-    // puts("bst2:");
-    // insert_bst(&bst2, 7);
-    // insert_bst(&bst2, 2);
-    // insert_bst(&bst2, 1);
-    // insert_bst(&bst2, 4);
-    // insert_bst(&bst2, 3);
-    // insert_bst(&bst2, 6);
-    // insert_bst(&bst2, 11);
-    // insert_bst(&bst2, 8);
-    // insert_bst(&bst2, 13);
-    // print_bst(bst2);
-    // print_in_level_order(bst2);
-
-    // NodePtr merged = merge_bst(bst, bst1);
-
-    // puts("-------------------");
-    // puts("merged: ");
-    // print_bst(merged);
-    // print_in_level_order(merged);
-
-    // puts("");
-
-    // destroy_bst(&bst);
-    // destroy_bst(&bst1);
-    // destroy_bst(&bst2);
-    // destroy_bst(&merged);
     NodePtr nu3 = NULL;
     insert_bst(&nu3, 4);
     insert_bst(&nu3, 3);
     insert_bst(&nu3, 2);
     insert_bst(&nu3, 5);
     insert_bst(&nu3, 6);
-    insert_bst(&nu3, 9);
-    insert_bst(&nu3, 8);
-    insert_bst(&nu3, 10);
-    insert_bst(&nu3, 6);
-    insert_bst(&nu3, 10);
-    insert_bst(&nu3, 11);
+    insert_bst(&nu3, 4);
+
     print_bst(nu3);
-    puts("-----------------");
-    delete_bst(&nu3, 6);
-    print_bst(nu3);
+
+    puts("");
+    pretty_print_bst(nu3);
+
     // NodePtr *successor = successor_bst(&(nu->right));
     // printf("successor: %d\n", (*successor)->key); // 2
+}
+
+void pretty_print_bst(NodePtr bst)
+{
+    size_t size = size_bst(bst);
+    printf("size: %zu\n", size);
 }
 
 void insert_bst(NodePtr *bstPtr, int key)

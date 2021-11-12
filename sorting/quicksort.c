@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 void swap(int arr[], size_t index1, size_t index2);
 void putMedianInMiddle(int arr[], size_t length);
@@ -18,7 +19,7 @@ int main(void)
     srand(42);
     showArray(arr, length);
     puts("");
-    quickSort(arr, length - 1);
+    quickSort(arr, length);
     showArray(arr, length);
 
     return 0;
@@ -66,6 +67,13 @@ size_t partitionArray(int arr[], size_t length)
 
 void quickSort(int arr[], size_t length)
 {
+    static bool subtracted = false;
+
+    if (!subtracted)
+    {
+        length--;
+        subtracted = true;
+    }
     if (length <= 1)
         return;
     putMedianInMiddle(arr, length);
@@ -104,3 +112,11 @@ void putMedianInMiddle(int arr[], size_t length)
         swap(arr, first, last);
     }
 }
+
+/*
+    Stability: the measure of whther or not hte given inputs stay in the same order
+
+    Ex: input; 5, _, _, 5, _, _, _, 5
+    output: would the five's still be in the same order when they are together
+        - stability is how well they stay together
+*/

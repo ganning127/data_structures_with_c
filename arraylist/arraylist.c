@@ -54,7 +54,7 @@ void al_insert(ArrayList *list, int key)
 void al_delete(ArrayList *list, int key)
 {
     /*
-        look from the front     
+        look from the front
         once we find it, start shifting things behind the item found
 
         starting from front will make one full pass of the array

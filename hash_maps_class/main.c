@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define INITIAL_SIZE 8
-#define LOAD_FACTOR 0.6667
+#define INITIAL_SIZE 1
+#define LOAD_FACTOR_MIN 4
+#define LOAD_FACTOR_MAX 5
 
 typedef struct hash_node
 {
@@ -11,53 +12,45 @@ typedef struct hash_node
     struct hash_node *next;
 } HNode;
 
-typedef struct arraylist_strings
-{
-    char **array;    // declared as pointer so we don't need to specify size
-    size_t size;     // how many elements its currently holding
-    size_t capacity; // how many elements it can hold
-} ArrayListStrings;
-
 typedef struct arraylist_nodes
 {
     HNode **array;
-    size_t size;
+    size_t keys;
     size_t capacity;
 } ArrayListNodes;
 
-void resize(ArrayListNodes *);
-ArrayListStrings *arls_create();
+void resize(ArrayListNodes *, size_t new_capcity);
 ArrayListNodes *arln_create();
 size_t hash(char *str, size_t size);
-void arls_destroy(ArrayListStrings **listPtr);
 void arln_destroy(ArrayListNodes **listPtr);
 void arln_insert(ArrayListNodes *list, char *key, int value);
 int arln_get(ArrayListNodes *list, char *key);
+void alrn_delete(ArrayListNodes *list, char *key);
 
 int main(void)
 {
-    ArrayListStrings *sList = arls_create();
     ArrayListNodes *nList = arln_create();
+    arln_insert(nList, "a", 3);
+    arln_insert(nList, "b", 4);
+    arln_insert(nList, "c", 5);
+    arln_insert(nList, "d", 6);
+    arln_insert(nList, "e", 7);
+    arln_insert(nList, "f", 8);
+    arln_insert(nList, "g", 9);
+    arln_insert(nList, "h", 10);
+    arln_insert(nList, "i", 11);
+    arln_insert(nList, "j", 12);
 
-    arln_insert(nList, "ganning", 1);
-    arln_insert(nList, "asdfasdf", 2);
-    int value = arln_get(nList, "asdfasdf");
-
-    printf("key found: %d\n", value);
-
-    arls_destroy(&sList);
     arln_destroy(&nList);
     free(nList);
-    free(sList);
     return 0;
 }
 
-void resize(ArrayListNodes *list)
+void resize(ArrayListNodes *list, size_t new_capacity)
 {
-    size_t new_size = list->capacity * 2; // double size of the array
-    HNode **new_array = (HNode **)malloc(sizeof(HNode *) * new_size);
+    HNode **new_array = (HNode **)malloc(sizeof(HNode *) * new_capacity);
 
-    for (size_t i = 0; i < new_size; i++)
+    for (size_t i = 0; i < new_capacity; i++)
     {
         new_array[i] = NULL; // go through each node and set it to NULL
     }
@@ -67,7 +60,7 @@ void resize(ArrayListNodes *list)
         HNode *curr = list->array[i]; // get the current node
         while (curr != NULL)
         {
-            size_t index = hash(curr->key, new_size); // get the index of the node in the new array
+            size_t index = hash(curr->key, new_capacity); // get the index of the node in the new array
             HNode *next = curr->next;
             curr->next = new_array[index];
             new_array[index] = curr;
@@ -76,7 +69,7 @@ void resize(ArrayListNodes *list)
     }
     free(list->array); // free memory of old array
     list->array = new_array;
-    list->capacity = new_size;
+    list->capacity = new_capacity;
 }
 
 int arln_get(ArrayListNodes *list, char *key)
@@ -97,6 +90,19 @@ int arln_get(ArrayListNodes *list, char *key)
     return -1;
 }
 
+HNode *find_node(HNode *node, char *key)
+{
+    while (node != NULL)
+    {
+        if (strcmp(node->key, key) == 0)
+        {
+            return node;
+        }
+        node = node->next;
+    }
+    return NULL;
+}
+
 void arln_insert(ArrayListNodes *list, char *key, int value)
 {
     size_t index = hash(key, list->capacity);
@@ -111,15 +117,56 @@ void arln_insert(ArrayListNodes *list, char *key, int value)
     }
     else
     {
+        // TODO: check if the key is already in there
+        /*
+            if the key is already there, move it to the front of the linked list
+        */
+
+        HNode *curr = list->array[index];
+        HNode *node_found = find_node(curr, key);
+
+        if (node_found)
+        {
+            // move the node to the beginning of linked list
+        }
         HNode *current = list->array[index];
         list->array[index] = nu; // insert to beg of linked list
         nu->next = current;
     }
 
-    list->size++;
+    list->keys++;
 
-    if (list->size > list->capacity * LOAD_FACTOR) // change this
-        resize(list);
+    if (list->keys > list->capacity * LOAD_FACTOR_MAX) // change this
+        resize(list, list->capacity * 2);
+}
+
+void alrn_delete(ArrayListNodes *list, char *key)
+{
+    size_t index = hash(key, list->capacity);
+    HNode *curr = list->array[index];
+    HNode *prev = NULL;
+
+    while (curr != NULL)
+    {
+        if (strcmp(curr->key, key) == 0)
+        {
+            if (prev == NULL)
+            {
+                list->array[index] = curr->next;
+            }
+            else
+            {
+                prev->next = curr->next;
+            }
+            free(curr);
+            list->keys--;
+            return;
+        }
+        prev = curr;
+        curr = curr->next;
+    }
+    if (list->keys < list->capacity * LOAD_FACTOR_MIN)
+        resize(list, list->capacity / 2);
 }
 
 size_t hash(char *str, size_t size)
@@ -136,19 +183,10 @@ size_t hash(char *str, size_t size)
     return hash;
 }
 
-ArrayListStrings *arls_create()
-{
-    ArrayListStrings *list = malloc(sizeof(ArrayListStrings));
-    list->size = 0;
-    list->capacity = INITIAL_SIZE;
-    list->array = calloc(sizeof(char *), INITIAL_SIZE);
-    return list;
-}
-
 ArrayListNodes *arln_create()
 {
     ArrayListNodes *list = malloc(sizeof(ArrayListNodes));
-    list->size = 0;
+    list->keys = 0;
     list->capacity = INITIAL_SIZE;
     list->array = calloc(sizeof(HNode *), INITIAL_SIZE);
     // set all the pointers to NULL
@@ -157,19 +195,6 @@ ArrayListNodes *arln_create()
         list->array[i] = NULL;
     }
     return list;
-}
-
-void arls_destroy(ArrayListStrings **listPtr)
-{
-    ArrayListStrings *list = *listPtr;
-    for (size_t i = 0; i < list->size; ++i)
-    {
-
-        free(list->array[i]);
-    }
-    free(list->array);
-    free(list);
-    *listPtr = NULL;
 }
 
 void lldestroy(HNode **list)
@@ -188,7 +213,7 @@ void lldestroy(HNode **list)
 void arln_destroy(ArrayListNodes **listPtr)
 {
     ArrayListNodes *list = *listPtr;
-    for (size_t i = 0; i < list->size; ++i)
+    for (size_t i = 0; i < list->capacity; ++i)
     {
         lldestroy(&(list->array[i]));
         free(list->array[i]);
@@ -229,4 +254,24 @@ void arln_destroy(ArrayListNodes **listPtr)
         - we want to resize it when the load factor is greater than 2/3 or 0.6666667
         - loadFactor = nodes / arraySize
 
+*/
+
+/*
+Open addressing:
+LOAD FACTORS:
+    < 0.6: half the size
+    >= 0.7: double the size
+
+insert():
+    - go to index of the hash, and check if it is full
+    - if it is full, keep going to find a new index
+        - linear probing (go to next index) (WE ARE NOT GOING TO DO THIS)
+    - if the index in which you want to insert is already marked by an alemenet ready for deletion,
+        - replace that node with the thing you want to delete
+
+delete():
+    - hash the key that you want to delete
+    - go to the index of the hash
+    - check if the key is there
+    - if it is there, mark it ready for deletion
 */

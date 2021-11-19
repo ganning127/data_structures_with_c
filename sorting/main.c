@@ -8,36 +8,30 @@ void split_merge(int arr_a[], int arr_b[], size_t length);
 void merge(int *listA, int *listB, size_t a_length);
 int random_int(int min, int max);
 void swap(int arr[], size_t index1, size_t index2);
-void putMedianAtBeg(int arr[], size_t length);
+void putMedianAtMed(int arr[], size_t length);
 void quickSort(int arr[], size_t length);
 
 int main(void)
 {
-    size_t length = 50;
     // put random numbers in array
+    size_t length = 3;
     int arr[length];
     for (size_t i = 0; i < length; i++)
-    {
         arr[i] = rand() % 100 + 1;
-    }
 
-    // show array
-    showArray(arr, length);
+    showArray(arr, length); // show array
 
-    // sort array using merge sort
-    merge_sort(arr, length);
-
-    puts("");
-    // show array
-    showArray(arr, length);
+    merge_sort(arr, length); // SORT 1: sort array using merge sort
 
     puts("");
 
-    // sort array using quick sort in descending order
-    quickSort(arr, length);
+    showArray(arr, length); // show array
 
-    // show array
-    showArray(arr, length);
+    puts("");
+
+    quickSort(arr, length); // SORT 2: sort array using quick sort in descending order
+
+    showArray(arr, length); // show array
 }
 
 void merge_sort(int arr[], size_t length)
@@ -126,9 +120,9 @@ size_t partitionArray(int arr[], size_t length)
     // i is where you are inseting items when you find an item near the end that is smaler than the pivot
     */
 
-    int pivot = arr[length - 1];
+    int pivot = arr[length / 2];
     int i = -1;
-    int j = length + 1;
+    int j = length;
     while (1)
     {
         do
@@ -151,16 +145,9 @@ size_t partitionArray(int arr[], size_t length)
 
 void quickSort(int arr[], size_t length)
 {
-    static bool subtracted = false;
-
-    if (!subtracted)
-    {
-        length--;
-        subtracted = true;
-    }
     if (length <= 1)
         return;
-    putMedianAtBeg(arr, length);
+    putMedianAtMed(arr, length);
     size_t i = partitionArray(arr, length);
     quickSort(arr, i);
     quickSort(arr + i + 1, length - i - 1);
@@ -173,9 +160,8 @@ void swap(int arr[], size_t index1, size_t index2)
     arr[index2] = temp;
 }
 
-void putMedianAtBeg(int arr[], size_t length)
+void putMedianAtMed(int arr[], size_t length)
 {
-
     size_t middle = length / 2;
     size_t first = 0;
     size_t last = length - 1;
@@ -183,17 +169,17 @@ void putMedianAtBeg(int arr[], size_t length)
     // printf("middle: %d\n", arr[middle]);
     // printf("last: %d\n", arr[last]);
 
-    if (arr[first] > arr[last])
+    if (arr[first] < arr[middle])
     {
-        swap(arr, first, last);
+        swap(arr, first, middle);
     }
-    if (arr[middle] < arr[first])
+    if (arr[middle] < arr[last])
     {
         swap(arr, middle, last);
     }
-    if (arr[first] > arr[last])
+    if (arr[first] < arr[middle])
     {
-        swap(arr, first, last);
+        swap(arr, first, middle);
     }
 }
 

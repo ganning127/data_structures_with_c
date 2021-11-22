@@ -1,2 +1,2 @@
 # Data Structures with C
-### idk what im doing lol
+- [Stanford CS Education Library](http://cslibrary.stanford.edu/)

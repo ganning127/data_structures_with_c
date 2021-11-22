@@ -14,7 +14,7 @@ void quickSort(int arr[], size_t length);
 int main(void)
 {
     // put random numbers in array
-    size_t length = 3;
+    size_t length = 10;
     int arr[length];
     for (size_t i = 0; i < length; i++)
         arr[i] = rand() % 100 + 1;

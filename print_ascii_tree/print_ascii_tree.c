@@ -1,9 +1,4 @@
-
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include "types.h"
-#include "bst_consts.h"
+#include "print_ascii_tree.h"
 
 NodePtr make_empty(NodePtr t)
 {
@@ -165,14 +160,14 @@ int MAX(int X, int Y)
     return ((X) > (Y)) ? (X) : (Y);
 }
 
-asciinode *build_ascii_tree_recursive(NodePtr t)
+Asciinode *build_ascii_tree_recursive(NodePtr t)
 {
-    asciinode *node;
+    Asciinode *node;
 
     if (t == NULL)
         return NULL;
 
-    node = malloc(sizeof(asciinode));
+    node = malloc(sizeof(Asciinode));
     node->left = build_ascii_tree_recursive(t->left);
     node->right = build_ascii_tree_recursive(t->right);
 
@@ -193,9 +188,9 @@ asciinode *build_ascii_tree_recursive(NodePtr t)
 }
 
 // Copy the tree into the ascii node structre
-asciinode *build_ascii_tree(NodePtr t)
+Asciinode *build_ascii_tree(NodePtr t)
 {
-    asciinode *node;
+    Asciinode *node;
     if (t == NULL)
         return NULL;
     node = build_ascii_tree_recursive(t);
@@ -204,7 +199,7 @@ asciinode *build_ascii_tree(NodePtr t)
 }
 
 // Free all the nodes of the given tree
-void free_ascii_tree(asciinode *node)
+void free_ascii_tree(Asciinode *node)
 {
     if (node == NULL)
         return;
@@ -217,7 +212,7 @@ void free_ascii_tree(asciinode *node)
 // It assumes that the center of the label of the root of this tree
 // is located at a position (x,y).  It assumes that the edge_length
 // fields have been computed for this tree.
-void compute_lprofile(asciinode *node, int x, int y)
+void compute_lprofile(Asciinode *node, int x, int y)
 {
     int i, isleft;
     if (node == NULL)
@@ -235,7 +230,7 @@ void compute_lprofile(asciinode *node, int x, int y)
     compute_lprofile(node->right, x + node->edge_length + 1, y + node->edge_length + 1);
 }
 
-void compute_rprofile(asciinode *node, int x, int y)
+void compute_rprofile(Asciinode *node, int x, int y)
 {
     int i, notleft;
     if (node == NULL)
@@ -255,7 +250,7 @@ void compute_rprofile(asciinode *node, int x, int y)
 
 // This function fills in the edge_length and
 // height fields of the specified tree
-void compute_edge_lengths(asciinode *node)
+void compute_edge_lengths(Asciinode *node)
 {
     int h, hmin, i, delta;
     if (node == NULL)
@@ -329,7 +324,7 @@ void compute_edge_lengths(asciinode *node)
 
 // This function prints the given level of the given tree, assuming
 // that the node has the given x cordinate.
-void print_level(asciinode *node, int x, int level)
+void print_level(Asciinode *node, int x, int level)
 {
     int i, isleft;
     if (node == NULL)
@@ -382,7 +377,7 @@ void print_level(asciinode *node, int x, int level)
 // prints ascii tree for given Node structure
 void print_ascii_tree(NodePtr t)
 {
-    asciinode *proot;
+    Asciinode *proot;
     int xmin, i;
     if (t == NULL)
         return;
@@ -411,41 +406,41 @@ void print_ascii_tree(NodePtr t)
     free_ascii_tree(proot);
 }
 
-// driver routine
-int main()
-{
-    // A sample use of these functions.  Start with the empty tree
-    // insert some stuff into it, and then delete it
-    NodePtr root;
-    int i;
-    root = NULL;
+// // driver routine
+// int main()
+// {
+//     // A sample use of these functions.  Start with the empty tree
+//     // insert some stuff into it, and then delete it
+//     NodePtr root;
+//     int i;
+//     root = NULL;
 
-    make_empty(root);
+//     make_empty(root);
 
-    printf("\nAfter inserting key 10..\n");
-    root = insert(10, root);
-    print_ascii_tree(root);
+//     printf("\nAfter inserting key 10..\n");
+//     root = insert(10, root);
+//     print_ascii_tree(root);
 
-    printf("\nAfter inserting key 5..\n");
-    root = insert(5, root);
-    print_ascii_tree(root);
+//     printf("\nAfter inserting key 5..\n");
+//     root = insert(5, root);
+//     print_ascii_tree(root);
 
-    printf("\nAfter inserting key 15..\n");
-    root = insert(15, root);
-    print_ascii_tree(root);
+//     printf("\nAfter inserting key 15..\n");
+//     root = insert(15, root);
+//     print_ascii_tree(root);
 
-    printf("\nAfter inserting keys 9, 13..\n");
-    root = insert(9, root);
-    root = insert(13, root);
-    print_ascii_tree(root);
+//     printf("\nAfter inserting keys 9, 13..\n");
+//     root = insert(9, root);
+//     root = insert(13, root);
+//     print_ascii_tree(root);
 
-    printf("\nAfter inserting keys 2, 6, 12, 14, ..\n");
-    root = insert(2, root);
-    root = insert(6, root);
-    root = insert(12, root);
-    root = insert(14, root);
+//     printf("\nAfter inserting keys 2, 6, 12, 14, ..\n");
+//     root = insert(2, root);
+//     root = insert(6, root);
+//     root = insert(12, root);
+//     root = insert(14, root);
 
-    print_ascii_tree(root);
+//     print_ascii_tree(root);
 
-    make_empty(root);
-}
+//     make_empty(root);
+// }

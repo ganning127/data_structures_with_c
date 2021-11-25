@@ -1,8 +1,47 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "types.h"
-#include "bst_consts.h"
+#define INFINITY 999999
+#define MAX_HEIGHT 1000
+int lprofile[MAX_HEIGHT];
+int rprofile[MAX_HEIGHT];
+int print_next;
+int gap = 3;
+
+typedef struct Node
+{
+    int key;
+    struct Node *left;
+    struct Node *right;
+
+} Node;
+typedef Node *NodePtr;
+
+typedef struct queue_node
+{
+    NodePtr key;             // node in BST
+    struct queue_node *next; // pointer to the next element
+} QueueNode;
+typedef QueueNode *QueueNodePtr;
+
+typedef struct queue
+{
+    QueueNodePtr start;
+    QueueNodePtr end;
+} Queue;
+typedef Queue *QueuePtr;
+
+typedef struct printTreeNode
+{
+    struct printTreeNode *left, *right;
+    // length of the edge from this node to its children
+    int edge_length;
+    int height;
+    int lablen;
+    int parent_dir;
+    char label[11];
+} printTreeNode;
+typedef printTreeNode *printTreeNodePtr;
 
 QueuePtr create();
 void push(QueuePtr queue, NodePtr c);
@@ -22,15 +61,11 @@ int *bst_merge_lists(int *listA, int *listB, size_t sizeA, size_t sizeB);
 int *bst_to_list_w_size(NodePtr tree, size_t size);
 NodePtr bst_list_to_tree_w_size(int *list, size_t size);
 void print_in_level_order(NodePtr bst);
-void print_ascii_tree(NodePtr t);
-
-int lprofile[MAX_HEIGHT];
-int rprofile[MAX_HEIGHT];
-int print_next;
-int gap = 3;
+void print_bst_vertical(NodePtr t);
 
 int main(void)
 {
+
     NodePtr nu3 = NULL;
     insert_bst(&nu3, 3);
     insert_bst(&nu3, 1);
@@ -40,25 +75,18 @@ int main(void)
     insert_bst(&nu3, 6);
     insert_bst(&nu3, 7);
 
-    print_ascii_tree(nu3);
+    puts("Sideways tree");
+    print_bst(nu3);
+
+    puts("---------");
+    puts("vertically printed");
+    print_bst_vertical(nu3);
 
     destroy_bst(&nu3);
     free(nu3);
 }
 void insert_bst(NodePtr *bstPtr, int key)
 {
-    /*
-        Avg: O(log(n))
-            Testing for (bst == NULL)
-            Recursive call with half nodes
-
-        Worst: O(n)
-            When there are n elements in the BST, and there are also n levels, and therefore, and search would take n traversals. For example, inserting (1, 2, 3, 4, 5), in that order, would lead to worst case
-
-        Best: O(log(n))
-            When the BST is balanced, the time complexity is O(log(n)), which is the best case senario. Doubling the number of elements in the tree only adds one iteration, which is the definition of a log(n) time complexity.
-    */
-
     static unsigned int count = 0;
     NodePtr bst = *bstPtr;
     if (bst == NULL)
@@ -486,16 +514,16 @@ int MAX(int X, int Y)
     return ((X) > (Y)) ? (X) : (Y);
 }
 
-Asciinode *build_ascii_tree_recursive(NodePtr t)
+printTreeNodePtr build_vertical_tree_recursive(NodePtr t)
 {
-    AsciinodePtr node;
+    printTreeNodePtr node;
 
     if (t == NULL)
         return NULL;
 
-    node = malloc(sizeof(Asciinode));
-    node->left = build_ascii_tree_recursive(t->left);
-    node->right = build_ascii_tree_recursive(t->right);
+    node = malloc(sizeof(printTreeNode));
+    node->left = build_vertical_tree_recursive(t->left);
+    node->right = build_vertical_tree_recursive(t->right);
 
     if (node->left != NULL)
     {
@@ -512,18 +540,18 @@ Asciinode *build_ascii_tree_recursive(NodePtr t)
 
     return node;
 }
-AsciinodePtr build_ascii_tree(NodePtr t)
+printTreeNodePtr build_vertical_tree(NodePtr t)
 {
-    AsciinodePtr node;
+    printTreeNodePtr node;
     if (t == NULL)
         return NULL;
-    node = build_ascii_tree_recursive(t);
+    node = build_vertical_tree_recursive(t);
     node->parent_dir = 0;
     return node;
 }
 
-// prints ascii tree for given Node structure
-void compute_lprofile(AsciinodePtr node, int x, int y)
+// prints vertical tree for given Node structure
+void compute_lprofile(printTreeNodePtr node, int x, int y)
 {
     int i, isleft;
     if (node == NULL)
@@ -541,7 +569,7 @@ void compute_lprofile(AsciinodePtr node, int x, int y)
     compute_lprofile(node->right, x + node->edge_length + 1, y + node->edge_length + 1);
 }
 
-void compute_rprofile(AsciinodePtr node, int x, int y)
+void compute_rprofile(printTreeNodePtr node, int x, int y)
 {
     int i, notleft;
     if (node == NULL)
@@ -561,7 +589,7 @@ void compute_rprofile(AsciinodePtr node, int x, int y)
 
 // This function fills in the edge_length and
 // height fields of the specified tree
-void compute_edge_lengths(AsciinodePtr node)
+void compute_edge_lengths(printTreeNodePtr node)
 {
     int h, hmin, i, delta;
     if (node == NULL)
@@ -635,7 +663,7 @@ void compute_edge_lengths(AsciinodePtr node)
 
 // This function prints the given level of the given tree, assuming
 // that the node has the given x cordinate.
-void print_level(AsciinodePtr node, int x, int level)
+void print_level(printTreeNodePtr node, int x, int level)
 {
     int i, isleft;
     if (node == NULL)
@@ -685,23 +713,23 @@ void print_level(AsciinodePtr node, int x, int level)
     }
 }
 
-void free_ascii_tree(AsciinodePtr node)
+void free_vertical_tree(printTreeNodePtr node)
 {
     if (node == NULL)
         return;
-    free_ascii_tree(node->left);
-    free_ascii_tree(node->right);
+    free_vertical_tree(node->left);
+    free_vertical_tree(node->right);
     free(node);
 }
 
-// prints ascii tree for given Node structure
-void print_ascii_tree(NodePtr t)
+// prints vertical tree for given Node structure
+void print_bst_vertical(NodePtr t)
 {
-    AsciinodePtr proot;
+    printTreeNodePtr proot;
     int xmin, i;
     if (t == NULL)
         return;
-    proot = build_ascii_tree(t);
+    proot = build_vertical_tree(t);
     compute_edge_lengths(proot);
     for (i = 0; i < proot->height && i < MAX_HEIGHT; i++)
     {
@@ -719,9 +747,5 @@ void print_ascii_tree(NodePtr t)
         print_level(proot, -xmin, i);
         printf("\n");
     }
-    if (proot->height >= MAX_HEIGHT)
-    {
-        printf("(This tree is taller than %d, and may be drawn incorrectly.)\n", MAX_HEIGHT);
-    }
-    free_ascii_tree(proot);
+    free_vertical_tree(proot);
 }

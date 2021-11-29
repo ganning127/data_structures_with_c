@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #define INITIAL_SIZE 8
 
 typedef struct hash_node
@@ -31,7 +32,6 @@ ArrayListNodes *arln_create();
 
 int main(void)
 {
-    // find function is below
 
     return 0;
 }
@@ -48,7 +48,7 @@ size_t find(ArrayListNodes *list, char *key)
         {
             return index;
         }
-        index = (size_t)(hash_value + (0.5 * index) + (0.5 * index * index)) % list->capacity;
+        index = (size_t)(hash_value + (0.5 * index) + (0.5 * index * index)) % list->capacity; // look at the next index
     }
     return list->capacity;
 }
@@ -66,3 +66,39 @@ size_t hash(char *str, size_t size)
 
     return hash;
 }
+
+/*
+Open addressing: ArrayList of HNodes (not pointers)
+
+LOAD FACTORS:
+    < 0.25 : half the size
+    >= 0.7: double the size
+    - don't include deleted items in load factor because they will be removed anyways
+
+struct node {
+    char *key;
+    int value;
+    bool marked_for_deletion;
+};
+
+insert():
+    - go to index of the hash, and check if it is full
+    - if it is full, keep going to find a new index
+        - linear probing (go to next index) (WE ARE NOT GOING TO DO THIS)
+    - if the index in which you want to insert is already marked by an alemenet ready for deletion,
+        - replace that node with the thing you want to delete
+    - check if exceeding load factor upper
+        if so, resize
+
+delete():
+    - hash the key that you want to delete
+    - go to the index of the hash
+    - check if the key is there
+    - if it is there, mark it ready for deletion
+    - don't remove the node until we resize the hashmap
+    - check if exceeding load factor lower
+        if so, resize
+
+
+
+*/

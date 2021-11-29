@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #define INITIAL_SIZE 1
-#define LOAD_FACTOR_MIN 4
+#define LOAD_FACTOR_MIN 2
 #define LOAD_FACTOR_MAX 5
 
 typedef struct hash_node
@@ -74,6 +74,7 @@ void resize(ArrayListNodes *list, size_t new_capacity)
 
 int arln_get(ArrayListNodes *list, char *key)
 {
+    // TODO: make sure to move the item to the beginning of the linked list
     size_t index = hash(key, list->capacity);
     HNode *node = list->array[index];
     int key_found = 0;
@@ -253,25 +254,6 @@ void arln_destroy(ArrayListNodes **listPtr)
         - we do NOT want to wait until hash_map is full to resize it
         - we want to resize it when the load factor is greater than 2/3 or 0.6666667
         - loadFactor = nodes / arraySize
+        - NOT the number of buckets used
 
-*/
-
-/*
-Open addressing:
-LOAD FACTORS:
-    < 0.6: half the size
-    >= 0.7: double the size
-
-insert():
-    - go to index of the hash, and check if it is full
-    - if it is full, keep going to find a new index
-        - linear probing (go to next index) (WE ARE NOT GOING TO DO THIS)
-    - if the index in which you want to insert is already marked by an alemenet ready for deletion,
-        - replace that node with the thing you want to delete
-
-delete():
-    - hash the key that you want to delete
-    - go to the index of the hash
-    - check if the key is there
-    - if it is there, mark it ready for deletion
 */

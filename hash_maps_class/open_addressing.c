@@ -2,21 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#define INITIAL_SIZE 8
+#define INITIAL_SIZE 1
+#define LOAD_FACTOR_MAX 0.7
+#define LOAD_FACTOR_MIN 0.25
 
 typedef struct hash_node
 {
     char *key;
     int value;
+    bool to_be_deleted;
 } HNode;
 typedef HNode *HNodePtr;
-
-typedef struct arraylist_strings
-{
-    char **array;    // declared as pointer so we don't need to specify size
-    size_t size;     // how many elements its currently holding
-    size_t capacity; // how many elements it can hold
-} ArrayListStrings;
 
 typedef struct arraylist_nodes
 {
@@ -25,30 +21,187 @@ typedef struct arraylist_nodes
     size_t capacity;
 } ArrayListNodes;
 
+void insert(ArrayListNodes *list, char *key, int value);
+void delete (ArrayListNodes *list, char *key);
+int get(ArrayListNodes *list, char *key);
 size_t find(ArrayListNodes *list, char *key);
 size_t hash(char *str, size_t size);
-
+void resize(ArrayListNodes *list, size_t new_capacity);
+void showAllBuckets(ArrayListNodes *list);
 ArrayListNodes *arln_create();
+void arln_destroy(ArrayListNodes *list);
+double getLoadFactor(ArrayListNodes *list);
 
 int main(void)
 {
+    ArrayListNodes *list = arln_create();
+    insert(list, "key1", 1);
+    insert(list, "key2", 2);
+    insert(list, "key3", 3);
+    insert(list, "key4", 4);
+    insert(list, "key5", 5);
 
+    delete (list, "key3");
+    delete (list, "key4");
+    delete (list, "ganning"); // should say not found
+
+    printf("%d\n", get(list, "key1"));
+    printf("%d\n", get(list, "key2"));
+    get(list, "key3"); // should say not found, since it was deleted
+    get(list, "key4"); // should say not found, since it was deleted
+    printf("%d\n", get(list, "key5"));
+
+    delete (list, "key1");
+    delete (list, "key2");
+    delete (list, "key5");
+
+    arln_destroy(list);
     return 0;
+}
+
+ArrayListNodes *arln_create()
+{
+    ArrayListNodes *list = malloc(sizeof(ArrayListNodes));
+    list->size = 0;
+    list->capacity = INITIAL_SIZE;
+    list->array = calloc(sizeof(HNode *), INITIAL_SIZE);
+    return list;
+}
+
+void arln_destroy(ArrayListNodes *list)
+{
+    for (size_t i = 0; i < list->capacity; i++)
+    {
+        if (list->array[i] != NULL)
+        {
+            free(list->array[i]);
+        }
+    }
+    free(list->array);
+    free(list);
+}
+
+void showAllBuckets(ArrayListNodes *list)
+{
+    for (size_t i = 0; i < list->capacity; i++)
+    {
+        printf("Bucket %zu = ", i);
+        if (list->array[i] != NULL)
+            printf("%s: %d\n", list->array[i]->key, list->array[i]->value);
+        else
+            printf("\n");
+    }
+}
+
+size_t find_empty_index(HNode **list, size_t capacity, size_t orig_hash)
+{
+    // printf("list capacity: %zu\n", list->capacity);
+    size_t i = 0;
+    size_t index = orig_hash;
+    while (list[index] != NULL)
+    {
+        if (list[index]->to_be_deleted)
+            return index;
+        // the spot to insert can either be empty or marked for deletion
+        index = (size_t)(orig_hash + (i * 0.5) + (i * (i * 0.5))) % capacity;
+        i++;
+    }
+
+    return index; // list->array[index] must be NULL
+}
+
+void insert(ArrayListNodes *list, char *key, int value)
+{
+    size_t hash_value = hash(key, list->capacity);
+
+    size_t index = find_empty_index(list->array, list->capacity, hash_value);
+    // printf("index: %zu\n", index);
+
+    HNode *node = malloc(sizeof(HNode));
+    node->key = key;
+    node->value = value;
+    node->to_be_deleted = false;
+    list->array[index] = node;
+    list->size++;
+
+    if (getLoadFactor(list) > LOAD_FACTOR_MAX)
+    {
+        puts("doubling size of array");
+        resize(list, list->capacity * 2);
+    }
+}
+
+void delete (ArrayListNodes *list, char *key)
+{
+    size_t hash_value = hash(key, list->capacity);
+    size_t index = find(list, key);
+    if (index == list->capacity)
+    {
+        printf("key \"%s\" not found\n", key);
+        return;
+    }
+
+    list->array[index]->to_be_deleted = true;
+    list->size--; // means that we don't include deleted nodes in the size
+    if (getLoadFactor(list) < LOAD_FACTOR_MIN)
+    {
+        puts("halving size of array");
+        resize(list, list->capacity / 2);
+    }
+}
+
+int get(ArrayListNodes *list, char *key)
+{
+    size_t hash_value = hash(key, list->capacity);
+    size_t index = find(list, key);
+    if (index == list->capacity)
+    {
+        printf("key \"%s\" not found\n", key);
+        return 0;
+    }
+    if (list->array[index]->to_be_deleted)
+    {
+        printf("key \"%s\" has already been deleted\n", key);
+        return 0;
+    }
+    return list->array[index]->value;
+}
+
+void resize(ArrayListNodes *list, size_t new_capacity)
+{
+    HNode **new_array = calloc(sizeof(HNode *), new_capacity);
+    for (size_t i = 0; i < list->capacity; i++)
+    {
+        if (list->array[i] != NULL)
+        {
+            if (list->array[i]->to_be_deleted)
+                free(list->array[i]);
+            else
+            {
+                size_t hash_value = hash(list->array[i]->key, new_capacity);
+                size_t index = find_empty_index(new_array, new_capacity, hash_value);
+                new_array[index] = list->array[i];
+            }
+        }
+    }
+    free(list->array);
+    list->array = new_array;
+    list->capacity = new_capacity;
 }
 
 size_t find(ArrayListNodes *list, char *key)
 {
     // need this thing to return list -> capacity when key is not found
     size_t hash_value = hash(key, list->capacity);
+    size_t i = 0;
     size_t index = hash_value;
 
     while (list->array[index] != NULL)
     {
         if (strcmp(list->array[index]->key, key) == 0)
-        {
             return index;
-        }
-        index = (size_t)(hash_value + (0.5 * index) + (0.5 * index * index)) % list->capacity; // look at the next index
+        index = (size_t)(hash_value + (i * 0.5) + (i * (i * 0.5))) % list->capacity;
+        ++i;
     }
     return list->capacity;
 }
@@ -67,6 +220,10 @@ size_t hash(char *str, size_t size)
     return hash;
 }
 
+double getLoadFactor(ArrayListNodes *list)
+{
+    return (double)list->size / list->capacity;
+}
 /*
 Open addressing: ArrayList of HNodes (not pointers)
 
@@ -98,7 +255,4 @@ delete():
     - don't remove the node until we resize the hashmap
     - check if exceeding load factor lower
         if so, resize
-
-
-
 */

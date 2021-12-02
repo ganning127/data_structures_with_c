@@ -34,26 +34,25 @@ double getLoadFactor(ArrayListNodes *list);
 
 int main(void)
 {
+    // if you try to get a key that has been marked for deletion, the function will return 0
     ArrayListNodes *list = arln_create();
     insert(list, "key1", 1);
     insert(list, "key2", 2);
     insert(list, "key3", 3);
     insert(list, "key4", 4);
     insert(list, "key5", 5);
+    insert(list, "key6", 6);
 
     delete (list, "key3");
     delete (list, "key4");
     delete (list, "ganning"); // should say not found
 
-    printf("%d\n", get(list, "key1"));
-    printf("%d\n", get(list, "key2"));
-    get(list, "key3"); // should say not found, since it was deleted
-    get(list, "key4"); // should say not found, since it was deleted
-    printf("%d\n", get(list, "key5"));
-
-    delete (list, "key1");
-    delete (list, "key2");
-    delete (list, "key5");
+    printf("%s : %d\n", "key1", get(list, "key1"));
+    printf("%s : %d\n", "key2", get(list, "key2"));
+    printf("%s : %d\n", "key3", get(list, "key3")); // should say not found, since it was deleted
+    printf("%s : %d\n", "key4", get(list, "key4")); // should say not found, since it was deleted
+    printf("%s : %d\n", "haha", get(list, "haha")); // should say not found
+    printf("%s : %d\n", "key5", get(list, "key5"));
 
     arln_destroy(list);
     return 0;
@@ -87,7 +86,16 @@ void showAllBuckets(ArrayListNodes *list)
     {
         printf("Bucket %zu = ", i);
         if (list->array[i] != NULL)
-            printf("%s: %d\n", list->array[i]->key, list->array[i]->value);
+        {
+            if (list->array[i]->to_be_deleted)
+            {
+                printf("%s: %d (marked for del)\n", list->array[i]->key, list->array[i]->value);
+            }
+            else
+            {
+                printf("%s: %d\n", list->array[i]->key, list->array[i]->value);
+            }
+        }
         else
             printf("\n");
     }
@@ -102,8 +110,9 @@ size_t find_empty_index(HNode **list, size_t capacity, size_t orig_hash)
     {
         if (list[index]->to_be_deleted)
             return index;
+
+        index = (orig_hash + (i + (i * i)) / 2) % capacity;
         // the spot to insert can either be empty or marked for deletion
-        index = (size_t)(orig_hash + (i * 0.5) + (i * (i * 0.5))) % capacity;
         i++;
     }
 
@@ -112,11 +121,19 @@ size_t find_empty_index(HNode **list, size_t capacity, size_t orig_hash)
 
 void insert(ArrayListNodes *list, char *key, int value)
 {
-    size_t hash_value = hash(key, list->capacity);
+    size_t found_index = find(list, key); // check if the node is already in the list
+    if (found_index != list->capacity)
+    {
+        // if the key is already in the list, just update the value
+        list->array[found_index]->value = value;
+        list->array[found_index]->to_be_deleted = false;
+        return;
+    }
 
+    // if the key is not already in the list, then we need to insert it
+    size_t hash_value = hash(key, list->capacity);
     size_t index = find_empty_index(list->array, list->capacity, hash_value);
     // printf("index: %zu\n", index);
-
     HNode *node = malloc(sizeof(HNode));
     node->key = key;
     node->value = value;
@@ -126,7 +143,6 @@ void insert(ArrayListNodes *list, char *key, int value)
 
     if (getLoadFactor(list) > LOAD_FACTOR_MAX)
     {
-        puts("doubling size of array");
         resize(list, list->capacity * 2);
     }
 }
@@ -137,7 +153,7 @@ void delete (ArrayListNodes *list, char *key)
     size_t index = find(list, key);
     if (index == list->capacity)
     {
-        printf("key \"%s\" not found\n", key);
+        printf("key \"%s\" not found and cannot be deleted.\n", key);
         return;
     }
 
@@ -145,7 +161,6 @@ void delete (ArrayListNodes *list, char *key)
     list->size--; // means that we don't include deleted nodes in the size
     if (getLoadFactor(list) < LOAD_FACTOR_MIN)
     {
-        puts("halving size of array");
         resize(list, list->capacity / 2);
     }
 }
@@ -161,7 +176,7 @@ int get(ArrayListNodes *list, char *key)
     }
     if (list->array[index]->to_be_deleted)
     {
-        printf("key \"%s\" has already been deleted\n", key);
+        printf("key \"%s\" was marked for deletion\n", key);
         return 0;
     }
     return list->array[index]->value;
@@ -200,10 +215,10 @@ size_t find(ArrayListNodes *list, char *key)
     {
         if (strcmp(list->array[index]->key, key) == 0)
             return index;
-        index = (size_t)(hash_value + (i * 0.5) + (i * (i * 0.5))) % list->capacity;
+        index = (hash_value + (i + (i * i)) / 2) % list->capacity;
         ++i;
     }
-    return list->capacity;
+    return list->capacity; // if the key is not found, return the capacity
 }
 
 size_t hash(char *str, size_t size)

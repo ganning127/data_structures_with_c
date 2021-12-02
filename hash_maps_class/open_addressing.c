@@ -16,7 +16,7 @@ typedef HNode *HNodePtr;
 
 typedef struct arraylist_nodes
 {
-    HNode **array;
+    HNode *array;
     size_t size;
     size_t capacity;
 } ArrayListNodes;
@@ -49,9 +49,9 @@ int main(void)
 
     printf("%s : %d\n", "key1", get(list, "key1"));
     printf("%s : %d\n", "key2", get(list, "key2"));
-    printf("%s : %d\n", "key3", get(list, "key3")); // should say not found, since it was deleted
-    printf("%s : %d\n", "key4", get(list, "key4")); // should say not found, since it was deleted
-    printf("%s : %d\n", "haha", get(list, "haha")); // should say not found
+    printf("%s : %d\n", "key3", get(list, "key3")); // should say not found, since it was deleted, returns 0
+    printf("%s : %d\n", "key4", get(list, "key4")); // should say not found, since it was deleted, returns 0
+    printf("%s : %d\n", "haha", get(list, "haha")); // should say not found, returns 0
     printf("%s : %d\n", "key5", get(list, "key5"));
 
     arln_destroy(list);
@@ -63,19 +63,12 @@ ArrayListNodes *arln_create()
     ArrayListNodes *list = malloc(sizeof(ArrayListNodes));
     list->size = 0;
     list->capacity = INITIAL_SIZE;
-    list->array = calloc(sizeof(HNode *), INITIAL_SIZE);
+    list->array = calloc(sizeof(HNode), INITIAL_SIZE);
     return list;
 }
 
 void arln_destroy(ArrayListNodes *list)
 {
-    for (size_t i = 0; i < list->capacity; i++)
-    {
-        if (list->array[i] != NULL)
-        {
-            free(list->array[i]);
-        }
-    }
     free(list->array);
     free(list);
 }
@@ -85,15 +78,15 @@ void showAllBuckets(ArrayListNodes *list)
     for (size_t i = 0; i < list->capacity; i++)
     {
         printf("Bucket %zu = ", i);
-        if (list->array[i] != NULL)
+        if (list->array[i].key)
         {
-            if (list->array[i]->to_be_deleted)
+            if (list->array[i].to_be_deleted)
             {
-                printf("%s: %d (marked for del)\n", list->array[i]->key, list->array[i]->value);
+                printf("%s: %d (marked for del)\n", list->array[i].key, list->array[i].value);
             }
             else
             {
-                printf("%s: %d\n", list->array[i]->key, list->array[i]->value);
+                printf("%s: %d\n", list->array[i].key, list->array[i].value);
             }
         }
         else
@@ -101,14 +94,14 @@ void showAllBuckets(ArrayListNodes *list)
     }
 }
 
-size_t find_empty_index(HNode **list, size_t capacity, size_t orig_hash)
+size_t find_empty_index(HNode *list, size_t capacity, size_t orig_hash)
 {
     // printf("list capacity: %zu\n", list->capacity);
     size_t i = 0;
     size_t index = orig_hash;
-    while (list[index] != NULL)
+    while (list[index].key != NULL)
     {
-        if (list[index]->to_be_deleted)
+        if (list[index].to_be_deleted)
             return index;
 
         index = (orig_hash + (i + (i * i)) / 2) % capacity;
@@ -125,8 +118,8 @@ void insert(ArrayListNodes *list, char *key, int value)
     if (found_index != list->capacity)
     {
         // if the key is already in the list, just update the value
-        list->array[found_index]->value = value;
-        list->array[found_index]->to_be_deleted = false;
+        list->array[found_index].value = value;
+        list->array[found_index].to_be_deleted = false;
         return;
     }
 
@@ -134,11 +127,9 @@ void insert(ArrayListNodes *list, char *key, int value)
     size_t hash_value = hash(key, list->capacity);
     size_t index = find_empty_index(list->array, list->capacity, hash_value);
     // printf("index: %zu\n", index);
-    HNode *node = malloc(sizeof(HNode));
-    node->key = key;
-    node->value = value;
-    node->to_be_deleted = false;
-    list->array[index] = node;
+    list->array[index].key = key;
+    list->array[index].value = value;
+    list->array[index].to_be_deleted = false;
     list->size++;
 
     if (getLoadFactor(list) > LOAD_FACTOR_MAX)
@@ -157,7 +148,7 @@ void delete (ArrayListNodes *list, char *key)
         return;
     }
 
-    list->array[index]->to_be_deleted = true;
+    list->array[index].to_be_deleted = true;
     list->size--; // means that we don't include deleted nodes in the size
     if (getLoadFactor(list) < LOAD_FACTOR_MIN)
     {
@@ -169,34 +160,24 @@ int get(ArrayListNodes *list, char *key)
 {
     size_t hash_value = hash(key, list->capacity);
     size_t index = find(list, key);
-    if (index == list->capacity)
+    if (index == list->capacity || list->array[index].to_be_deleted)
     {
-        printf("key \"%s\" not found\n", key);
+        printf("key \"%s\" not found, or was already deleted.\n", key);
         return 0;
     }
-    if (list->array[index]->to_be_deleted)
-    {
-        printf("key \"%s\" was marked for deletion\n", key);
-        return 0;
-    }
-    return list->array[index]->value;
+    return list->array[index].value;
 }
 
 void resize(ArrayListNodes *list, size_t new_capacity)
 {
-    HNode **new_array = calloc(sizeof(HNode *), new_capacity);
+    HNode *new_array = calloc(sizeof(HNode), new_capacity);
     for (size_t i = 0; i < list->capacity; i++)
     {
-        if (list->array[i] != NULL)
+        if (list->array[i].key != NULL && !list->array[i].to_be_deleted)
         {
-            if (list->array[i]->to_be_deleted)
-                free(list->array[i]);
-            else
-            {
-                size_t hash_value = hash(list->array[i]->key, new_capacity);
-                size_t index = find_empty_index(new_array, new_capacity, hash_value);
-                new_array[index] = list->array[i];
-            }
+            size_t hash_value = hash(list->array[i].key, new_capacity);
+            size_t index = find_empty_index(new_array, new_capacity, hash_value);
+            new_array[index] = list->array[i];
         }
     }
     free(list->array);
@@ -211,9 +192,9 @@ size_t find(ArrayListNodes *list, char *key)
     size_t i = 0;
     size_t index = hash_value;
 
-    while (list->array[index] != NULL)
+    while (list->array[index].key != NULL)
     {
-        if (strcmp(list->array[index]->key, key) == 0)
+        if (strcmp(list->array[index].key, key) == 0)
             return index;
         index = (hash_value + (i + (i * i)) / 2) % list->capacity;
         ++i;
@@ -227,7 +208,6 @@ size_t hash(char *str, size_t size)
     size_t hash = 0;
     while (*str != '\0')
     {
-        // printf("%c", *str);
         hash = (hash * 31 + *str) % size;
         ++str;
     }

@@ -51,6 +51,9 @@ int main(void)
     arln_insert(nList, "ins18", 18);
     arln_insert(nList, "ins19", 19);
     arln_insert(nList, "ins20", 20);
+    arln_insert(nList, "ins1", 21); // this will overwrite the previous value
+
+    // showBuckets(nList);
 
     printf("%d\n", arln_get(nList, "ins1"));
     printf("%d\n", arln_get(nList, "ins2"));
@@ -76,8 +79,6 @@ int main(void)
 
     arln_destroy(&nList);
 
-    puts("");
-
     ArrayListNodes *nList2 = arln_create();
     arln_insert(nList2, "ins1", 1);
     arln_insert(nList2, "ins2", 2);
@@ -85,13 +86,8 @@ int main(void)
     arln_insert(nList2, "ins4", 4);
     arln_insert(nList2, "ins5", 5);
 
-    puts("--------showing that arln_get() puts nodes at the front of the linked list--------");
-    showBuckets(nList2);
-    arln_get(nList2, "ins1");
-
-    showBuckets(nList2);
-
     arln_destroy(&nList2);
+
     return 0;
 }
 
@@ -155,24 +151,29 @@ HNode *next_node_is_target(HNode *node, char *key)
     return NULL;
 }
 
-void arln_insert(ArrayListNodes *list, char *key, int value)
+HNode *createNode(char *key, int value)
 {
-    size_t index = hash(key, list->capacity);
     HNode *nu = malloc(sizeof(HNode));
     nu->key = key;
     nu->value = value;
     nu->next = NULL;
+    return nu;
+}
+void arln_insert(ArrayListNodes *list, char *key, int value)
+{
+    size_t index = hash(key, list->capacity);
 
     if (list->array[index] == NULL)
     {
-        list->array[index] = nu;
+        list->array[index] = createNode(key, value);
     }
     else
     {
         HNode *current = list->array[index];
         if (strcmp(current->key, key) == 0)
         {
-            current->value = value; // just update the value
+            // in case the node was the first one in the bucket
+            current->value = value;
             return;
         }
 
@@ -184,10 +185,12 @@ void arln_insert(ArrayListNodes *list, char *key, int value)
             prev_node->next = temp->next;
             temp->next = list->array[index];
             list->array[index] = temp;
+            list->array[index]->value = value;
         }
         else
         {
             // key was not already in linked list
+            HNode *nu = createNode(key, value);
             list->array[index] = nu; // insert to beg of linked list
             nu->next = current;
         }

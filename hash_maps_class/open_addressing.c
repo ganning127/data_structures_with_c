@@ -36,23 +36,49 @@ int main(void)
 {
     // if you try to get a key that has been marked for deletion, the function will return 0
     ArrayListNodes *list = arln_create();
-    insert(list, "key1", 1);
-    insert(list, "key2", 2);
-    insert(list, "key3", 3);
-    insert(list, "key4", 4);
-    insert(list, "key5", 5);
-    insert(list, "key6", 6);
 
-    delete (list, "key3");
-    delete (list, "key4");
-    delete (list, "ganning"); // should say not found
+    char *key1 = "xzRyyIgY5rHzKgdWXFdw";
+    char *key2 = "EbI3v03srIID7U510Zl6";
+    char *key3 = "dkdFsUiENYylpTnZwGFj";
+    char *key4 = "dqa9raqZsj70jgkiJbQ3";
+    char *key5 = "E78i3OEDNNkvnxH1NYbM";
+    char *key6 = "VfXZNsuqpimj12tzB928";
+    char *key7 = "xD2KwCYjJtzk0O1jLfb9";
+    char *key8 = "YOzU86hEpC6ntekJWnRy";
+    char *key9 = "RwiEgg6b5oYzqcRH6VeU";
+    char *key10 = "KcC6thzPQggFYVjE2Ixx";
+    char *key11 = "qPYSFTGascyHjO8HtgzS";
+    char *key12 = "ao3dftOOPKAl4zIVG4wZ";
+    char *key13 = "QISI21CTjUyF0MC04LOm";
 
-    printf("%s : %d\n", "key1", get(list, "key1"));
-    printf("%s : %d\n", "key2", get(list, "key2"));
-    printf("%s : %d\n", "key3", get(list, "key3")); // should say not found, since it was deleted, returns 0
-    printf("%s : %d\n", "key4", get(list, "key4")); // should say not found, since it was deleted, returns 0
-    printf("%s : %d\n", "haha", get(list, "haha")); // should say not found, returns 0
-    printf("%s : %d\n", "key5", get(list, "key5"));
+    insert(list, key1, 1);
+    insert(list, key2, 2);
+    insert(list, key3, 3);
+    insert(list, key4, 4);
+    insert(list, key5, 5);
+    insert(list, key6, 6);
+    insert(list, key7, 7);
+    insert(list, key8, 8);
+    insert(list, key9, 9);
+    insert(list, key10, 10);
+    insert(list, key11, 11);
+    insert(list, key12, 12);
+    insert(list, key13, 13);
+    insert(list, key1, 1353); // this will overwrite the value of key1
+
+    printf("%s : %d\n", key1, get(list, key1));
+    printf("%s : %d\n", key2, get(list, key2));
+    printf("%s : %d\n", key3, get(list, key3));
+    printf("%s : %d\n", key4, get(list, key4));
+    printf("%s : %d\n", key5, get(list, key5));
+    printf("%s : %d\n", key6, get(list, key6));
+    printf("%s : %d\n", key7, get(list, key7));
+    printf("%s : %d\n", key8, get(list, key8));
+    printf("%s : %d\n", key9, get(list, key9));
+    printf("%s : %d\n", key10, get(list, key10));
+    printf("%s : %d\n", key11, get(list, key11));
+    printf("%s : %d\n", key12, get(list, key12));
+    printf("%s : %d\n", key13, get(list, key13));
 
     arln_destroy(list);
     return 0;
